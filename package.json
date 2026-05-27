@@ -1,0 +1,35 @@
+{
+  "name": "agent-tool-intel",
+  "version": "0.1.0",
+  "description": "Agent Tool Intelligence Layer — AI agent discovers, evaluates, and selects tools autonomously",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed": "tsx scripts/seed.ts",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.0",
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "bullmq": "^5.34.0",
+    "dockerode": "^4.0.2",
+    "drizzle-orm": "^0.38.0",
+    "hono": "^4.6.0",
+    "ioredis": "^5.4.0",
+    "openai": "^4.77.0",
+    "pg": "^8.13.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/dockerode": "^3.3.31",
+    "@types/node": "^22.10.0",
+    "@types/pg": "^8.11.0",
+    "drizzle-kit": "^0.30.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}

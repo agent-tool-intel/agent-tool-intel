@@ -5,6 +5,90 @@ import { eq, desc, sql } from "drizzle-orm";
 
 export const publicRoute = new Hono();
 
+// ── API Docs page ──
+
+publicRoute.get("/docs", (c) => {
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API Docs — Agent Tool Intelligence</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #0a0a0f; color: #e0e0e0; line-height:1.6; padding:40px 20px; }
+.container { max-width:800px; margin:0 auto; }
+h1 { font-size:1.8em; margin-bottom:8px; background: linear-gradient(135deg, #7c9ff5, #a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+h2 { font-size:1.2em; margin:32px 0 12px; color:#e0e0e0; }
+.endpoint { background:#161b22; border:1px solid #30363d; border-radius:8px; padding:20px; margin-bottom:16px; }
+.method { display:inline-block; padding:3px 10px; border-radius:4px; font-weight:700; font-size:0.8em; margin-right:10px; }
+.method.post { background:rgba(40,167,69,0.2); color:#28a745; }
+.method.get { background:rgba(108,117,227,0.2); color:#6c75e3; }
+.endpoint .path { font-family:monospace; color:#7c9ff5; font-size:1.05em; }
+.endpoint .desc { color:#8b949e; margin-top:8px; font-size:0.9em; }
+.endpoint code { display:block; background:#0d1117; border:1px solid #30363d; border-radius:6px; padding:12px 16px; font-size:0.82em; margin:12px 0; overflow-x:auto; color:#e0e0e0; white-space:pre-wrap; word-break:break-all; }
+.back { color:#7c9ff5; text-decoration:none; font-size:0.9em; }
+.back:hover { color:#a0b8ff; }
+</style>
+</head>
+<body>
+<div class="container">
+<a href="/" class="back">← Back to Leaderboard</a>
+<h1>API Documentation</h1>
+<p style="color:#8b949e;margin-bottom:24px">Base URL: <code style="color:#7c9ff5;background:#161b22;padding:2px 8px;border-radius:4px">https://agent-tool-intel-production.up.railway.app</code></p>
+
+<h2>Search Tools</h2>
+<div class="endpoint">
+  <span class="method post">POST</span><span class="path">/api/v1/search</span>
+  <div class="desc">Semantic search with agent signals, quality scores, and community data.</div>
+  <code>curl -X POST https://agent-tool-intel-production.up.railway.app/api/v1/search \\
+  -H "Content-Type: application/json" \\
+  -d '{"query":"extract tables from PDF","maxResults":3}'</code>
+</div>
+
+<h2>Get Tool Detail</h2>
+<div class="endpoint">
+  <span class="method get">GET</span><span class="path">/api/v1/tools/:id</span>
+  <div class="desc">Full tool details with quality, trust, sandbox results.</div>
+  <code>curl https://agent-tool-intel-production.up.railway.app/api/v1/tools/{tool_id}</code>
+</div>
+
+<h2>Sandbox Test</h2>
+<div class="endpoint">
+  <span class="method post">POST</span><span class="path">/api/v1/tools/:id/test</span>
+  <div class="desc">Run automated validation checks on a tool.</div>
+  <code>curl -X POST https://agent-tool-intel-production.up.railway.app/api/v1/tools/{tool_id}/test</code>
+</div>
+
+<h2>Submit Feedback</h2>
+<div class="endpoint">
+  <span class="method post">POST</span><span class="path">/api/v1/feedback</span>
+  <div class="desc">Submit agent usage feedback to improve trust scores.</div>
+  <code>curl -X POST https://agent-tool-intel-production.up.railway.app/api/v1/feedback \\
+  -H "Content-Type: application/json" \\
+  -d '{"toolId":"tool:mcp:puppeteer/puppeteer@latest","result":"success","rating":5}'</code>
+</div>
+
+<h2>Grade Badge</h2>
+<div class="endpoint">
+  <span class="method get">GET</span><span class="path">/badge/:server_name</span>
+  <div class="desc">Dynamic SVG badge showing tool quality grade.</div>
+  <code>https://agent-tool-intel-production.up.railway.app/badge/puppeteer%2Fpuppeteer</code>
+</div>
+
+<h2>Health Check</h2>
+<div class="endpoint">
+  <span class="method get">GET</span><span class="path">/health</span>
+  <div class="desc">Service health status.</div>
+  <code>curl https://agent-tool-intel-production.up.railway.app/health</code>
+</div>
+
+</div>
+</body>
+</html>`;
+  return c.html(html);
+});
+
 // ── Homepage: Leaderboard ──
 
 publicRoute.get("/", async (c) => {

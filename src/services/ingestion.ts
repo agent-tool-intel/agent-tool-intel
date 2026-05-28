@@ -146,9 +146,17 @@ const GITHUB_QUERIES = [
   "topic:mcp-server language:typescript stars:>3",
   "topic:mcp-server language:python stars:>3",
   "topic:mcp-server language:go stars:>3",
+  // Deep search: README mentions, config files, orgs
+  "\"mcp server\" in:readme stars:>3",
+  "\"model context protocol\" in:readme stars:>3",
+  "mcp.json in:name",
+  "filename:mcp.json",
+  "org:modelcontextprotocol",
+  "\"@modelcontextprotocol/sdk\" in:description",
+  "\"mcp-server\" in:name stars:>1",
 ];
 
-const MAX_PAGES_PER_QUERY = 5;
+const MAX_PAGES_PER_QUERY = 15;
 const PER_PAGE = 100;
 
 export async function scrapeGitHubMCPTopic(): Promise<ScrapedServer[]> {
@@ -163,6 +171,7 @@ export async function scrapeGitHubMCPTopic(): Promise<ScrapedServer[]> {
       headers: {
         "User-Agent": "AgentToolIntel/0.1.0",
         Accept: "application/vnd.github.v3+json",
+        ...(process.env.GITHUB_TOKEN ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` } : {}),
       },
       signal: AbortSignal.timeout(15000),
     });
@@ -217,7 +226,7 @@ export async function scrapeGitHubMCPTopic(): Promise<ScrapedServer[]> {
       allResults.push(...pageResults);
       if (pageResults.length < PER_PAGE) break;
       // Rate limit: 10 req/min unauthenticated, 30 with token
-      await new Promise((r) => setTimeout(r, process.env.GITHUB_TOKEN ? 2000 : 6000));
+      await new Promise((r) => setTimeout(r, process.env.GITHUB_TOKEN ? 1000 : 6000));
     }
   }
 

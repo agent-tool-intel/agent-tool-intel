@@ -215,8 +215,9 @@ export async function scrapeGitHubMCPTopic(): Promise<ScrapedServer[]> {
     for (let page = 1; page <= MAX_PAGES_PER_QUERY; page++) {
       const pageResults = await fetchPage(query, page);
       allResults.push(...pageResults);
-      if (pageResults.length < PER_PAGE) break; // No more pages
-      await new Promise((r) => setTimeout(r, 800)); // Rate limit: 10 req/min unauthenticated
+      if (pageResults.length < PER_PAGE) break;
+      // Rate limit: 10 req/min unauthenticated, 30 with token
+      await new Promise((r) => setTimeout(r, process.env.GITHUB_TOKEN ? 2000 : 6000));
     }
   }
 
@@ -330,6 +331,58 @@ export async function scrapeNpmMcp(): Promise<ScrapedServer[]> {
   }
 }
 
+// ── PyPI Scraper ──
+
+export async function scrapePyPiMcp(): Promise<ScrapedServer[]> {
+  console.log("  🔍 Searching PyPI for MCP servers...");
+
+  try {
+    const results: ScrapedServer[] = [];
+    const searches = ["mcp-server", "modelcontextprotocol", "mcp"];
+
+    for (const term of searches) {
+      const url = `https://pypi.org/search/?q=${term}&o=&page=1`;
+      const resp = await fetch(url, {
+        headers: { "User-Agent": "AgentToolIntel/0.1.0" },
+        signal: AbortSignal.timeout(15000),
+      });
+
+      if (!resp.ok) continue;
+
+      const html = await resp.text();
+
+      // Parse PyPI search results (server-rendered HTML)
+      const pkgRegex = /<a\s+class="package-snippet__name"[^>]*href="\/project\/([^"]+)"[^>]*>([^<]+)<\/a>[\s\S]*?<p[^>]*>([^<]*)<\/p>/gi;
+      let match;
+      while ((match = pkgRegex.exec(html)) !== null) {
+        const pkgName = match[1]?.trim();
+        const displayName = match[2]?.trim();
+        const desc = match[3]?.trim();
+
+        if (pkgName && desc?.toLowerCase().includes("mcp")) {
+          results.push({
+            name: `pypi:${pkgName}`,
+            displayName: displayName || pkgName,
+            description: desc.slice(0, 200),
+            publisher: pkgName.split("-")[0] || "pypi",
+            isOfficial: false,
+            installCmd: `pip install ${pkgName}`,
+            installType: "pip",
+            sourceRegistry: "pypi",
+            sourceUrl: `https://pypi.org/project/${pkgName}/`,
+          });
+        }
+      }
+    }
+
+    console.log(`    → Found ${results.length} servers on PyPI`);
+    return results;
+  } catch (err) {
+    console.log(`    ⚠️ PyPI scrape failed: ${(err as Error).message}`);
+    return [];
+  }
+}
+
 // ── Main Ingestion Pipeline ──
 
 export async function runIngestion(): Promise<{
@@ -341,17 +394,18 @@ export async function runIngestion(): Promise<{
   console.log("📥 Starting data ingestion...");
 
   // 1. Scrape all sources (PulseMCP + MCP.so blocked by Cloudflare/client-render)
-  const [github, official, npm] = await Promise.all([
+  const [github, official, npm, pypi] = await Promise.all([
     scrapeGitHubMCPTopic(),
     scrapeOfficialRegistry(),
     scrapeNpmMcp(),
+    scrapePyPiMcp(),
   ]);
 
   // 2. Merge and deduplicate by name
   const allServers = new Map<string, ScrapedServer>();
 
   // Priority: Official > GitHub
-  for (const s of [...npm, ...github, ...official]) {
+  for (const s of [...pypi, ...npm, ...github, ...official]) {
     const key = s.name.toLowerCase();
     if (!allServers.has(key)) {
       allServers.set(key, s);

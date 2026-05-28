@@ -82,9 +82,7 @@ export const sandboxResults = pgTable("sandbox_results", {
 
 export const feedback = pgTable("feedback", {
   id: uuid("id").defaultRandom().primaryKey(),
-  toolId: uuid("tool_id")
-    .references(() => tools.id, { onDelete: "cascade" })
-    .notNull(),
+  toolId: text("tool_id").notNull(), // canonical_id or UUID
   searchId: text("search_id"),
   result: text("result").notNull(),
   latencyMs: integer("latency_ms"),

@@ -125,7 +125,7 @@ export type SearchRequest = z.infer<typeof SearchRequestSchema>;
 
 export const FeedbackRequestSchema = z.object({
   searchId: z.string().optional(),
-  toolId: z.string().uuid(),
+  toolId: z.string(), // UUID or canonical_id (e.g. tool:mcp:sirmews/mcp-pdf@latest)
   result: z.enum(["success", "partial", "failure"]),
   latencyMs: z.number().optional(),
   tokensUsed: z.number().optional(),

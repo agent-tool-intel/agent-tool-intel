@@ -178,9 +178,12 @@ footer { text-align:center; padding:40px 20px; color:#484f58; font-size:0.85em; 
   <!-- Badge Section -->
   <div class="badge-section">
     <h3>🏷️ Embed Your Grade Badge</h3>
-    <p style="color:#8b949e;margin-bottom:12px">Add your tool's quality grade to your GitHub README. Copy the markdown below and replace <code>YOUR_TOOL</code> with your canonical tool ID.</p>
-    <code>&lt;a href="https://agent-tool-intel-production.up.railway.app"&gt;&lt;img src="https://agent-tool-intel-production.up.railway.app/badge/YOUR_TOOL" alt="Agent Tool Intel Grade" /&gt;&lt;/a&gt;</code>
-    <p style="color:#8b949e;margin-top:10px;font-size:0.85em">Badge auto-updates as your quality and trust scores change.</p>
+    <p style="color:#8b949e;margin-bottom:12px">Add your tool's quality grade to your GitHub README. Replace <code>puppeteer/puppeteer</code> with your server name.</p>
+    <code>&lt;a href="https://agent-tool-intel-production.up.railway.app"&gt;&lt;img src="https://agent-tool-intel-production.up.railway.app/badge/puppeteer%2Fpuppeteer" alt="Agent Tool Intel Grade" /&gt;&lt;/a&gt;</code>
+    <div class="badge-preview" style="margin:12px 0;padding:12px;background:#0d1117;border-radius:6px;">
+      <span style="color:#8b949e;font-size:0.85em">Preview:</span>
+    </div>
+    <p style="color:#8b949e;margin-top:10px;font-size:0.85em">Badge auto-updates as scores change. Use server name (e.g. <code>puppeteer/puppeteer</code>) or canonical ID.</p>
   </div>
 </div>
 
@@ -236,23 +239,70 @@ function escapeH(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
   return c.html(html);
 });
 
-// ── Badge endpoint ──
+// ── Dynamic Grade Badge endpoint ──
 
-publicRoute.get("/badge/:toolId", (c) => {
-  const toolId = c.req.param("toolId");
-  // Return a simple SVG badge
-  // For now, static placeholder. Phase 2: dynamic grade lookup.
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="180" height="20">
-  <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="0%">
-    <stop offset="0%" stop-color="#7c9ff5"/>
-    <stop offset="100%" stop-color="#a78bfa"/>
-  </linearGradient>
-  <rect width="180" height="20" rx="4" fill="url(#bg)"/>
-  <text x="10" y="14" font-family="system-ui,sans-serif" font-size="11" fill="#fff" font-weight="700">Agent Tool Intel</text>
-  <text x="130" y="14" font-family="system-ui,sans-serif" font-size="11" fill="rgba(255,255,255,0.9)">Grade</text>
+publicRoute.get("/badge/:toolId", async (c) => {
+  const toolId = decodeURIComponent(c.req.param("toolId"));
+
+  // Lookup: try exact match on server name or canonical_id
+  const [serverResult, toolResult] = await Promise.all([
+    db.select({
+      grade: qualityScores.grade,
+      score: qualityScores.overallScore,
+      serverName: servers.name,
+    })
+    .from(servers)
+    .innerJoin(tools, eq(tools.serverId, servers.id))
+    .innerJoin(qualityScores, eq(tools.id, qualityScores.toolId))
+    .where(eq(servers.name, toolId))
+    .limit(1),
+    db.select({
+      grade: qualityScores.grade,
+      score: qualityScores.overallScore,
+      serverName: servers.name,
+    })
+    .from(servers)
+    .innerJoin(tools, eq(tools.serverId, servers.id))
+    .innerJoin(qualityScores, eq(tools.id, qualityScores.toolId))
+    .where(eq(servers.canonicalId, toolId))
+    .limit(1),
+  ]);
+
+  const result = serverResult[0] || toolResult[0];
+  const grade = result?.grade || "N/A";
+  const score = result?.score ? Number(result.score) : null;
+  const serverName = result?.serverName || toolId;
+
+  // Color mapping
+  const colors: Record<string, { bg: string; text: string }> = {
+    "A+": { bg: "#28a745", text: "#fff" },
+    "A":  { bg: "#28a745", text: "#fff" },
+    "B+": { bg: "#6c75e3", text: "#fff" },
+    "B":  { bg: "#6c75e3", text: "#fff" },
+    "C":  { bg: "#ffab00", text: "#000" },
+    "D":  { bg: "#dc3545", text: "#fff" },
+    "F":  { bg: "#dc3545", text: "#fff" },
+  };
+  const color = colors[grade.replace("-plus", "+")] || colors["C"]!;
+
+  const leftWidth = 125;
+  const rightWidth = grade === "N/A" ? 45 : grade.length > 2 ? 55 : 45;
+  const totalWidth = leftWidth + rightWidth;
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${totalWidth}" height="20">
+  <title>Agent Tool Intel: ${serverName} — Grade ${grade}${score ? ' (' + score + '/100)' : ''}</title>
+  <rect width="${totalWidth}" height="20" rx="4" fill="#333"/>
+  <rect width="${leftWidth}" height="20" rx="4" fill="#555"/>
+  <rect x="${leftWidth - 4}" width="${rightWidth + 4}" height="20" rx="4" fill="${color.bg}"/>
+  <rect x="4" y="0" width="${leftWidth - 4}" height="20" rx="4" fill="#555"/>
+  <text x="${leftWidth / 2}" y="14" font-family="system-ui,sans-serif" font-size="11" fill="#ccc" text-anchor="middle" font-weight="600">agent tool intel</text>
+  <text x="${leftWidth + rightWidth / 2}" y="14" font-family="system-ui,sans-serif" font-size="11" fill="${color.text}" text-anchor="middle" font-weight="800">${grade}</text>
 </svg>`;
 
-  return c.html(svg, 200, { "Content-Type": "image/svg+xml" });
+  return c.html(svg, 200, {
+    "Content-Type": "image/svg+xml",
+    "Cache-Control": "public, max-age=3600",
+  });
 });
 
 function escapeHtml(s: string): string {

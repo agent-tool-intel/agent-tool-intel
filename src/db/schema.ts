@@ -5,6 +5,7 @@ import { pgTable, uuid, text, boolean, integer, decimal, timestamp, jsonb, vecto
 export const servers = pgTable("servers", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: text("name").notNull().unique(),
+  canonicalId: text("canonical_id").notNull().unique(),
   displayName: text("display_name"),
   description: text("description").notNull(),
   repository: text("repository"),

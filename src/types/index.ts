@@ -1,10 +1,25 @@
 import { z } from "zod";
 
+// ── Canonical Tool ID ──
+// Format: tool:{source}:{namespace}/{name}@{version}
+// Sources: mcp, automine, composed, custom
+export type ToolSource = "mcp" | "automine" | "composed" | "custom";
+
+export function buildCanonicalId(
+  source: ToolSource,
+  namespace: string,
+  name: string,
+  version = "latest"
+): string {
+  return `tool:${source}:${namespace}/${name}@${version}`;
+}
+
 // ── MCP Server ──
 
 export interface Server {
   id: string;
   name: string;
+  canonicalId: string;
   displayName: string | null;
   description: string;
   repository: string | null;

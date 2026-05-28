@@ -2,6 +2,7 @@ import { db } from "../db/index.js";
 import { servers, tools, qualityScores } from "../db/schema.js";
 import { generateEmbedding } from "./embedding.js";
 import { scoreToolQuality } from "./quality.js";
+import { buildCanonicalId } from "../types/index.js";
 import { eq, and, count } from "drizzle-orm";
 
 // ── Types ──
@@ -309,10 +310,21 @@ export async function runIngestion(): Promise<{
       if (existing.length > 0) {
         serverId = existing[0]!.id;
       } else {
+        // Generate canonical ID
+        const parts = server.name.split("/");
+        const ns = parts.length > 1 ? parts[0]! : "unknown";
+        const nm = parts.length > 1 ? parts[1]! : server.name;
+        const canonicalId = buildCanonicalId(
+          server.sourceRegistry === "official" ? "mcp" : "mcp",
+          ns,
+          nm
+        );
+
         const [inserted] = await db
           .insert(servers)
           .values({
             name: server.name,
+            canonicalId,
             displayName: server.displayName,
             description: server.description,
             repository: server.repository ?? null,

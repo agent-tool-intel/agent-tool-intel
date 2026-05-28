@@ -5,6 +5,7 @@ import { db } from "../src/db/index.js";
 import { servers, tools, qualityScores } from "../src/db/schema.js";
 import { generateEmbedding } from "../src/services/embedding.js";
 import { scoreToolQuality } from "../src/services/quality.js";
+import { buildCanonicalId } from "../src/types/index.js";
 
 const SEED_SERVERS = [
   {
@@ -77,10 +78,18 @@ async function seed() {
   for (const server of SEED_SERVERS) {
     console.log(`  → Creating server: ${server.name}`);
 
+    const parts = server.name.split("/");
+    const canonicalId = buildCanonicalId(
+      "mcp",
+      parts.length > 1 ? parts[0]! : "unknown",
+      parts.length > 1 ? parts[1]! : server.name
+    );
+
     const [inserted] = await db
       .insert(servers)
       .values({
         name: server.name,
+        canonicalId,
         displayName: server.displayName,
         description: server.description,
         isOfficial: server.isOfficial,

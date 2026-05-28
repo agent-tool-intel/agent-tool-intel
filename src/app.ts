@@ -4,6 +4,7 @@ import { searchRoute } from "./routes/search.js";
 import { toolsRoute } from "./routes/tools.js";
 import { testRoute } from "./routes/test.js";
 import { feedbackRoute } from "./routes/feedback.js";
+import { publicRoute } from "./routes/public.js";
 
 const app = new Hono();
 
@@ -11,6 +12,9 @@ app.use("*", cors());
 
 // Health check
 app.get("/health", (c) => c.json({ status: "ok", version: "0.1.0" }));
+
+// Public page + badge
+app.route("/", publicRoute);
 
 // Agent-facing API routes
 app.route("/api/v1", searchRoute);

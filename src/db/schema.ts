@@ -17,6 +17,7 @@ export const servers = pgTable("servers", {
   websiteUrl: text("website_url"),
   sourceRegistry: text("source_registry"),
   sourceUrl: text("source_url"),
+  metadata: jsonb("metadata").default({}),    // {stars, downloads, pushed_at, topics, license...}
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });

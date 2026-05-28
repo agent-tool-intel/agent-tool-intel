@@ -176,6 +176,19 @@ export interface SearchResultTool {
   sandboxVerified: boolean;
   lastSandboxTest: string;
   recommendationSummary: string;
+  // Agent-native selection signals
+  agentSignals?: {
+    isOfficial: boolean;
+    githubStars: number;
+    lastPushDaysAgo: number | null;
+    activityStatus: "active" | "maintained" | "stale" | "abandoned";
+    documentation: {
+      hasReadme: boolean;
+      descriptionQuality: "excellent" | "good" | "acceptable" | "poor";
+    };
+  };
+  // Community score (human-generated signals)
+  communityScore: number;
   // Flags quality-trust contradiction for agent & human awareness
   discrepancy?: {
     type: "quality_beats_trust" | "trust_beats_quality" | "none";

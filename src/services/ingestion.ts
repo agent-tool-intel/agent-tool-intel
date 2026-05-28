@@ -20,6 +20,15 @@ interface ScrapedServer {
   sourceRegistry: string;
   sourceUrl: string;
   categories?: string[];
+  metadata?: {
+    github_stars?: number;
+    github_pushed_at?: string;
+    github_open_issues?: number;
+    github_topics?: string[];
+    github_license?: string;
+    npm_downloads_per_week?: number;
+    npm_version?: string;
+  };
 }
 
 // ── PulseMCP Scraper ──
@@ -154,9 +163,12 @@ const GITHUB_QUERIES = [
   "org:modelcontextprotocol",
   "\"@modelcontextprotocol/sdk\" in:description",
   "\"mcp-server\" in:name stars:>1",
+  // No-star threshold (catch everything)
+  "topic:mcp-server pushed:>2025-01-01",
+  "topic:model-context-protocol pushed:>2025-01-01",
 ];
 
-const MAX_PAGES_PER_QUERY = 15;
+const MAX_PAGES_PER_QUERY = 20;
 const PER_PAGE = 100;
 
 export async function scrapeGitHubMCPTopic(): Promise<ScrapedServer[]> {
@@ -185,7 +197,12 @@ export async function scrapeGitHubMCPTopic(): Promise<ScrapedServer[]> {
         html_url: string;
         stargazers_count: number;
         language: string | null;
-        owner: { login: string };
+        pushed_at: string;
+        updated_at: string;
+        open_issues_count: number;
+        topics: string[];
+        license: { spdx_id: string } | null;
+        owner: { login: string; type: string };
       }>;
     };
 
@@ -201,7 +218,8 @@ export async function scrapeGitHubMCPTopic(): Promise<ScrapedServer[]> {
         repo.owner.login === "modelcontextprotocol" ||
         repo.owner.login === "anthropics" ||
         repo.owner.login === "microsoft" ||
-        repo.owner.login === "google";
+        repo.owner.login === "google" ||
+        repo.owner.type === "Organization";
 
       results.push({
         name: repo.full_name,
@@ -214,6 +232,13 @@ export async function scrapeGitHubMCPTopic(): Promise<ScrapedServer[]> {
         installType: "npx",
         sourceRegistry: "github",
         sourceUrl: repo.html_url,
+        metadata: {
+          github_stars: repo.stargazers_count,
+          github_pushed_at: repo.pushed_at,
+          github_open_issues: repo.open_issues_count,
+          github_topics: repo.topics || [],
+          github_license: repo.license?.spdx_id || undefined,
+        },
       });
     }
     return results;
@@ -472,6 +497,7 @@ export async function runIngestion(): Promise<{
             websiteUrl: server.websiteUrl ?? null,
             sourceRegistry: server.sourceRegistry,
             sourceUrl: server.sourceUrl,
+            metadata: server.metadata || {},
           })
           .returning({ id: servers.id });
 

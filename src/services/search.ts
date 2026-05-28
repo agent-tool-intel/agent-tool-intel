@@ -24,9 +24,11 @@ interface SearchRow {
   token_count: number | null;
   input_schema: unknown;
   server_name: string;
+  server_metadata: Record<string, unknown> | null;
   install_cmd: string | null;
   install_type: string | null;
   publisher: string | null;
+  is_official: boolean;
   relevance_score: number;
 }
 
@@ -56,9 +58,11 @@ export async function searchTools(params: SearchParams): Promise<SearchResponse>
       t.token_count,
       t.input_schema,
       s.name AS server_name,
+      s.metadata AS server_metadata,
       s.install_cmd,
       s.install_type,
       s.publisher,
+      s.is_official,
       1 - (t.embedding <=> ${embeddingStr}::vector) AS relevance_score
     FROM tools t
     JOIN servers s ON t.server_id = s.id
@@ -216,6 +220,8 @@ export async function searchTools(params: SearchParams): Promise<SearchResponse>
           row.server_name,
           row.tool_name
         ),
+        agentSignals: buildAgentSignals(row),
+        communityScore: calcCommunityScore(row),
         discrepancy: getDiscrepancy(qualityScore, trustScore, quality?.grade ?? "C"),
       };
     })
@@ -296,6 +302,53 @@ function getDiscrepancy(
     message: "Quality and trust are aligned",
     detail: `Quality (${qualityScore}/100, ${qualityGrade}) and trust (${Math.round(trustScore)}/100) are consistent. No contradiction detected.`,
   };
+}
+
+function buildAgentSignals(row: SearchRow): SearchResultTool["agentSignals"] {
+  const meta = (row.server_metadata || {}) as Record<string, unknown>;
+  const pushedAt = meta.github_pushed_at as string | undefined;
+  const lastPushDaysAgo = pushedAt
+    ? Math.floor((Date.now() - new Date(pushedAt).getTime()) / (86400000))
+    : null;
+
+  let activityStatus: "active" | "maintained" | "stale" | "abandoned";
+  if (lastPushDaysAgo === null) activityStatus = "maintained";
+  else if (lastPushDaysAgo <= 30) activityStatus = "active";
+  else if (lastPushDaysAgo <= 180) activityStatus = "maintained";
+  else if (lastPushDaysAgo <= 365) activityStatus = "stale";
+  else activityStatus = "abandoned";
+
+  return {
+    isOfficial: row.is_official === true,
+    githubStars: (meta.github_stars as number) || 0,
+    lastPushDaysAgo,
+    activityStatus,
+    documentation: {
+      hasReadme: true, // GitHub repos always have README
+      descriptionQuality: row.token_count && row.token_count <= 200 ? "excellent"
+        : row.token_count && row.token_count <= 500 ? "good"
+        : row.token_count && row.token_count <= 1000 ? "acceptable"
+        : "poor",
+    },
+  };
+}
+
+function calcCommunityScore(row: SearchRow): number {
+  const meta = (row.server_metadata || {}) as Record<string, unknown>;
+  const stars = (meta.github_stars as number) || 0;
+  const pushedAt = meta.github_pushed_at as string | undefined;
+  const daysAgo = pushedAt
+    ? Math.floor((Date.now() - new Date(pushedAt).getTime()) / 86400000)
+    : 365;
+
+  // Stars: log scale, 0-100
+  const starScore = Math.min(100, Math.log2(stars + 1) * 10); // 1024 stars = 100, 32 stars = 50
+  // Activity: 0-100
+  const activityScore = Math.max(0, 100 - daysAgo * 0.27); // ~1 year = 0
+  // Official bonus
+  const officialBonus = row.is_official ? 20 : 0;
+
+  return Math.round(Math.min(100, starScore * 0.5 + activityScore * 0.35 + officialBonus * 0.75));
 }
 
 function getEfficiencyRating(tokens: number): "excellent" | "good" | "acceptable" | "poor" {

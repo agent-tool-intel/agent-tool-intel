@@ -166,9 +166,17 @@ const GITHUB_QUERIES = [
   // No-star threshold (catch everything)
   "topic:mcp-server pushed:>2025-01-01",
   "topic:model-context-protocol pushed:>2025-01-01",
+  // Long tail: search README for MCP patterns
+  "\"npm install\" mcp in:readme language:typescript stars:>0",
+  "\"pip install\" mcp in:readme language:python stars:>0",
+  "\"npx\" mcp in:readme stars:>1",
+  // npm packages that mention MCP
+  "\"modelcontextprotocol/sdk\" in:package.json",
+  // Star-less: very new or niche
+  "topic:mcp created:>2025-06-01",
 ];
 
-const MAX_PAGES_PER_QUERY = 20;
+const MAX_PAGES_PER_QUERY = 25;
 const PER_PAGE = 100;
 
 export async function scrapeGitHubMCPTopic(): Promise<ScrapedServer[]> {

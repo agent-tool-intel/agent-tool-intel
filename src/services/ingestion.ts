@@ -131,10 +131,25 @@ export async function scrapeMcpSo(): Promise<ScrapedServer[]> {
 // ── GitHub MCP Topic Scraper (multi-page, multi-query) ──
 
 const GITHUB_QUERIES = [
-  "topic:mcp-server stars:>20",
-  "topic:model-context-protocol stars:>20",
-  "mcp server in:description stars:>50",
+  // Topic-based (highest signal)
+  "topic:mcp-server stars:>5",
+  "topic:model-context-protocol stars:>5",
+  "topic:mcp stars:>5",
+  "topic:mcp-tool stars:>5",
+  "topic:mcp-client stars:>5",
+  "topic:mcp-integration stars:>5",
+  // Keyword-based (long tail)
+  "mcp server in:description stars:>10",
+  "\"model context protocol\" in:description stars:>10",
+  "mcp in:name stars:>10 NOT topic:mcp-server NOT topic:model-context-protocol",
+  // Language-specific
+  "topic:mcp-server language:typescript stars:>3",
+  "topic:mcp-server language:python stars:>3",
+  "topic:mcp-server language:go stars:>3",
 ];
+
+const MAX_PAGES_PER_QUERY = 5;
+const PER_PAGE = 100;
 
 export async function scrapeGitHubMCPTopic(): Promise<ScrapedServer[]> {
   console.log("  🔍 Searching GitHub for MCP servers...");
@@ -142,7 +157,7 @@ export async function scrapeGitHubMCPTopic(): Promise<ScrapedServer[]> {
 
   async function fetchPage(query: string, page: number): Promise<ScrapedServer[]> {
     const q = encodeURIComponent(query);
-    const url = `https://api.github.com/search/repositories?q=${q}&sort=stars&order=desc&per_page=100&page=${page}`;
+    const url = `https://api.github.com/search/repositories?q=${q}&sort=stars&order=desc&per_page=${PER_PAGE}&page=${page}`;
 
     const resp = await fetch(url, {
       headers: {
@@ -197,11 +212,11 @@ export async function scrapeGitHubMCPTopic(): Promise<ScrapedServer[]> {
 
   const allResults: ScrapedServer[] = [];
   for (const query of GITHUB_QUERIES) {
-    for (let page = 1; page <= 3; page++) {
+    for (let page = 1; page <= MAX_PAGES_PER_QUERY; page++) {
       const pageResults = await fetchPage(query, page);
       allResults.push(...pageResults);
-      if (pageResults.length < 100) break; // No more pages
-      await new Promise((r) => setTimeout(r, 500)); // Rate limit avoidance
+      if (pageResults.length < PER_PAGE) break; // No more pages
+      await new Promise((r) => setTimeout(r, 800)); // Rate limit: 10 req/min unauthenticated
     }
   }
 
@@ -257,6 +272,64 @@ export async function scrapeOfficialRegistry(): Promise<ScrapedServer[]> {
   }
 }
 
+// ── npm Registry Scraper ──
+
+export async function scrapeNpmMcp(): Promise<ScrapedServer[]> {
+  console.log("  🔍 Searching npm for MCP servers...");
+
+  try {
+    const results: ScrapedServer[] = [];
+    const keywords = ["mcp-server", "modelcontextprotocol", "mcp-tool", "mcp-client"];
+
+    for (const kw of keywords) {
+      const url = `https://registry.npmjs.org/-/v1/search?text=keywords:${kw}&size=50`;
+      const resp = await fetch(url, {
+        headers: { "User-Agent": "AgentToolIntel/0.1.0" },
+        signal: AbortSignal.timeout(15000),
+      });
+
+      if (!resp.ok) continue;
+
+      const data = (await resp.json()) as {
+        objects?: Array<{
+          package: {
+            name: string;
+            description?: string;
+            links: { npm: string; repository?: string };
+            version: string;
+          };
+        }>;
+      };
+
+      if (!data.objects) continue;
+
+      for (const obj of data.objects) {
+        const pkg = obj.package;
+        if (!pkg.description?.toLowerCase().includes("mcp")) continue;
+
+        results.push({
+          name: `npm:${pkg.name}`,
+          displayName: pkg.name,
+          description: (pkg.description || "").slice(0, 200),
+          repository: pkg.links.repository,
+          publisher: pkg.name.split("/")[0] || "npm",
+          isOfficial: false,
+          installCmd: `npx ${pkg.name}`,
+          installType: "npx",
+          sourceRegistry: "npm",
+          sourceUrl: pkg.links.npm,
+        });
+      }
+    }
+
+    console.log(`    → Found ${results.length} servers on npm`);
+    return results;
+  } catch (err) {
+    console.log(`    ⚠️ npm scrape failed: ${(err as Error).message}`);
+    return [];
+  }
+}
+
 // ── Main Ingestion Pipeline ──
 
 export async function runIngestion(): Promise<{
@@ -268,16 +341,17 @@ export async function runIngestion(): Promise<{
   console.log("📥 Starting data ingestion...");
 
   // 1. Scrape all sources (PulseMCP + MCP.so blocked by Cloudflare/client-render)
-  const [github, official] = await Promise.all([
+  const [github, official, npm] = await Promise.all([
     scrapeGitHubMCPTopic(),
     scrapeOfficialRegistry(),
+    scrapeNpmMcp(),
   ]);
 
   // 2. Merge and deduplicate by name
   const allServers = new Map<string, ScrapedServer>();
 
   // Priority: Official > GitHub
-  for (const s of [...github, ...official]) {
+  for (const s of [...npm, ...github, ...official]) {
     const key = s.name.toLowerCase();
     if (!allServers.has(key)) {
       allServers.set(key, s);

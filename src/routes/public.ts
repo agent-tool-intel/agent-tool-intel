@@ -211,8 +211,8 @@ footer { text-align:center; padding:40px 20px; color:#484f58; font-size:0.85em; 
 
 <div class="hero">
   <h1>Agent Tool Intelligence</h1>
-  <p>The quality standard for AI agent tools. Semantic search, automated quality scoring, trust engine, and sandbox validation — built for agents, transparent for humans.</p>
-  <span class="api-url">POST api.agenttoolintel.com/api/v1/search</span>
+  <p>The quality standard for MCP tools. <strong>${totalServers.toLocaleString()}</strong> servers indexed. Semantic search, quality scoring, trust engine, agent-native signals — built for agents, transparent for builders.</p>
+  <span class="api-url">agent-tool-intel-production.up.railway.app</span>
 </div>
 
 <div class="stats">
@@ -261,13 +261,15 @@ footer { text-align:center; padding:40px 20px; color:#484f58; font-size:0.85em; 
 
   <!-- Badge Section -->
   <div class="badge-section">
-    <h3>🏷️ Embed Your Grade Badge</h3>
-    <p style="color:#8b949e;margin-bottom:12px">Add your tool's quality grade to your GitHub README. Replace <code>puppeteer/puppeteer</code> with your server name.</p>
-    <code>&lt;a href="https://agent-tool-intel-production.up.railway.app"&gt;&lt;img src="https://agent-tool-intel-production.up.railway.app/badge/puppeteer%2Fpuppeteer" alt="Agent Tool Intel Grade" /&gt;&lt;/a&gt;</code>
-    <div class="badge-preview" style="margin:12px 0;padding:12px;background:#0d1117;border-radius:6px;">
-      <span style="color:#8b949e;font-size:0.85em">Preview:</span>
+    <h3>🏷️ Get Your Grade Badge</h3>
+    <p style="color:#8b949e;margin-bottom:12px">Show your MCP server's quality grade on your GitHub README. Clickable badge — drives visitors to your tool's ranking.</p>
+    <div class="badge-preview" style="margin:16px 0;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <span style="color:#e0e0e0;font-weight:600">puppeteer/puppeteer</span>
+      <span style="color:#8b949e">→</span>
+      <img src="/badge/puppeteer%2Fpuppeteer" alt="Grade A" style="height:20px" />
     </div>
-    <p style="color:#8b949e;margin-top:10px;font-size:0.85em">Badge auto-updates as scores change. Use server name (e.g. <code>puppeteer/puppeteer</code>) or canonical ID.</p>
+    <code>&lt;a href="https://agent-tool-intel-production.up.railway.app"&gt;&lt;img src="https://agent-tool-intel-production.up.railway.app/badge/YOUR_ORG%2FYOUR_REPO" alt="Agent Tool Intel Grade" /&gt;&lt;/a&gt;</code>
+    <p style="color:#8b949e;margin-top:10px;font-size:0.85em">Replace <code>YOUR_ORG%2FYOUR_REPO</code> with your server name. <code>/</code> → <code>%2F</code>. Badge auto-updates.</p>
   </div>
 </div>
 

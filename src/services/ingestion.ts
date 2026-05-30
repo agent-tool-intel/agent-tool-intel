@@ -176,6 +176,36 @@ const GITHUB_QUERIES = [
   "topic:mcp created:>2025-06-01",
 ];
 
+// Filter: skip repos that are NOT MCP servers
+function isMcpServer(repo: { description?: string | null; topics?: string[]; name?: string }): boolean {
+  const desc = (repo.description || "").toLowerCase();
+  const topics = (repo.topics || []).map(t => t.toLowerCase());
+  const name = (repo.name || "").toLowerCase();
+  const fullText = desc + " " + topics.join(" ") + " " + name;
+
+  // Skip: awesome lists, curated collections, templates
+  const nonMcpPatterns = [
+    "awesome", "awesome-list", "curated list", "collection of",
+    "awesome-mcp", "mcp-list", "mcp directory", "mcp registry",
+    "template", "starter", "boilerplate",
+    "not an mcp", "not a mcp",
+  ];
+  for (const p of nonMcpPatterns) {
+    if (fullText.includes(p)) return false;
+  }
+
+  // Must have at least one MCP indicator
+  const mcpIndicators = [
+    "mcp server", "mcp tool", "mcp client", "mcp integration",
+    "model context protocol", "modelcontextprotocol",
+    "mcp for", "mcp to", "mcp wrapper",
+  ];
+  const hasMcpIndicator = mcpIndicators.some(i => fullText.includes(i));
+  if (!hasMcpIndicator) return false;
+
+  return true;
+}
+
 const MAX_PAGES_PER_QUERY = 25;
 const PER_PAGE = 100;
 
@@ -220,6 +250,9 @@ export async function scrapeGitHubMCPTopic(): Promise<ScrapedServer[]> {
     for (const repo of data.items) {
       if (seen.has(repo.full_name)) continue;
       seen.add(repo.full_name);
+
+      // Filter: skip non-MCP repos
+      if (!isMcpServer({ description: repo.description, topics: repo.topics, name: repo.full_name })) continue;
 
       // Detect install method instead of defaulting to npx
       const desc = repo.description || `${repo.full_name} MCP server`;

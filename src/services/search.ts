@@ -361,13 +361,19 @@ function buildAgentSignals(row: SearchRow): SearchResultTool["agentSignals"] {
   else if (lastPushDaysAgo <= 365) activityStatus = "stale";
   else activityStatus = "abandoned";
 
+  // Publisher verification: official orgs + known MCP orgs
+  const verifiedOrgs = ["modelcontextprotocol", "anthropics", "microsoft", "google", "cloudflare", "aws", "meta", "elastic", "sentry", "argoproj-labs", "tableau"];
+  const isVerifiedPublisher = row.is_official === true || verifiedOrgs.includes((row.publisher || "").toLowerCase());
+
   return {
     isOfficial: row.is_official === true,
+    isVerifiedPublisher,
     githubStars: (meta.github_stars as number) || 0,
     lastPushDaysAgo,
+    lastPushDate: pushedAt || null,
     activityStatus,
     documentation: {
-      hasReadme: true, // GitHub repos always have README
+      hasReadme: true,
       descriptionQuality: row.token_count && row.token_count <= 200 ? "excellent"
         : row.token_count && row.token_count <= 500 ? "good"
         : row.token_count && row.token_count <= 1000 ? "acceptable"

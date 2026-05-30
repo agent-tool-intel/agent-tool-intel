@@ -179,8 +179,10 @@ export interface SearchResultTool {
   // Agent-native selection signals
   agentSignals?: {
     isOfficial: boolean;
+    isVerifiedPublisher: boolean;  // Official org OR known maintainer
     githubStars: number;
     lastPushDaysAgo: number | null;
+    lastPushDate: string | null;   // ISO date
     activityStatus: "active" | "maintained" | "stale" | "abandoned";
     documentation: {
       hasReadme: boolean;

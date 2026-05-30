@@ -296,6 +296,116 @@ li { color:#8b949e; padding:4px 0; font-size:0.9em; }
   return c.html(html);
 });
 
+// ── Tool Health Dashboard ──
+
+publicRoute.get("/health/:owner/:repo", async (c) => {
+  const owner = c.req.param("owner");
+  const repo = c.req.param("repo");
+  const fullName = `${owner}/${repo}`;
+
+  const result = await db
+    .select({
+      tool: tools,
+      server: servers,
+      quality: qualityScores,
+    })
+    .from(tools)
+    .innerJoin(servers, eq(tools.serverId, servers.id))
+    .innerJoin(qualityScores, eq(tools.id, qualityScores.toolId))
+    .where(eq(servers.name, fullName))
+    .limit(1);
+
+  if (!result[0]) {
+    return c.html(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Not Found</title></head>
+    <body style="background:#0a0a0f;color:#e0e0e0;font-family:system-ui;padding:60px;text-align:center">
+    <h1 style="color:#8b949e">${escapeHtml(fullName)} not yet indexed</h1>
+    <p><a href="/" style="color:#7c9ff5">← Back to Leaderboard</a></p></body></html>`, 404);
+  }
+
+  const { tool: t, server: s, quality: q } = result[0];
+  const grade = q?.grade || "?";
+  const score = Number(q?.overallScore || 0);
+
+  // Improvement tips
+  const tips: string[] = [];
+  const correctness = Number(q?.correctness || 0);
+  const efficiency = Number(q?.efficiency || 0);
+  const descriptionQ = Number(q?.descriptionQ || 0);
+  const security = Number(q?.security || 0);
+  const installRel = Number(q?.installRel || 0);
+
+  if (correctness < 70) tips.push(`📋 <strong>Add input schema</strong>: Define a JSON Schema for your tool's parameters. Agents need to know what inputs to provide. Currently scoring ${correctness}/100.`);
+  if (efficiency < 55) tips.push(`⚡ <strong>Reduce token count</strong>: Your tool definition uses ~${t.tokenCount || '?'} tokens. Try to keep it under 250 tokens for optimal efficiency. Currently scoring ${efficiency}/100.`);
+  if (descriptionQ < 65) tips.push(`📝 <strong>Improve description</strong>: Use clear action verbs and keep length between 50-200 characters. Make it obvious what your tool does. Currently scoring ${descriptionQ}/100.`);
+  if (security < 75) tips.push(`🔒 <strong>Check for prompt injection patterns</strong>: Avoid phrases like "ignore previous" or "override your" in descriptions. Currently scoring ${security}/100.`);
+  if (installRel < 50) tips.push(`📦 <strong>Clarify install method</strong>: Make it clear whether this is npm, pip, HTTP endpoint, or other. Currently scoring ${installRel}/100.`);
+
+  if (tips.length === 0) tips.push(`🎉 <strong>Great job!</strong> Your tool scores well across all dimensions. Keep maintaining it and collecting real-world trust data.`);
+
+  // Score breakdown bars
+  const barColors: Record<string, string> = { "90+": "#28a745", "70-89": "#6c75e3", "50-69": "#ffab00", "<50": "#dc3545" };
+  const barColor = (v: number) => v >= 90 ? barColors["90+"] : v >= 70 ? barColors["70-89"] : v >= 50 ? barColors["50-69"] : barColors["<50"];
+
+  const html = `<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${escapeHtml(fullName)} — Tool Health Dashboard</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #0a0a0f; color: #e0e0e0; line-height:1.6; padding:40px 20px; }
+.container { max-width:800px; margin:0 auto; }
+h1 { font-size:1.6em; margin-bottom:4px; }
+h2 { font-size:1.1em; margin:28px 0 12px; border-bottom:1px solid #21262d; padding-bottom:8px; }
+.card { background:#161b22; border:1px solid #30363d; border-radius:8px; padding:20px; margin-bottom:16px; }
+.dim { color:#8b949e; font-size:0.85em; }
+.bar-wrap { background:#0d1117; border-radius:4px; height:8px; margin:4px 0 10px; }
+.bar-fill { height:8px; border-radius:4px; transition:width 0.3s; }
+.score-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin:12px 0; }
+.score-item { background:#0d1117; border-radius:8px; padding:12px; text-align:center; }
+.score-item .val { font-size:1.4em; font-weight:800; }
+.score-item .sm { font-size:0.75em; color:#8b949e; margin-top:2px; }
+.tip { background:#0d1117; border-left:3px solid #ffab00; padding:10px 14px; margin:8px 0; border-radius:0 6px 6px 0; font-size:0.95em; }
+.good { border-left-color:#28a745 !important; }
+.back { color:#7c9ff5; text-decoration:none; font-size:0.9em; }
+.grade-badge { display:inline-block; padding:4px 12px; border-radius:12px; font-weight:800; font-size:1em; margin-left:8px; }
+${grade.includes("A") ? ".grade-badge{background:rgba(40,167,69,0.15);color:#28a745}" : grade.includes("B") ? ".grade-badge{background:rgba(108,117,227,0.15);color:#6c75e3}" : grade.includes("C") ? ".grade-badge{background:rgba(255,171,0,0.15);color:#ffab00}" : ".grade-badge{background:rgba(220,53,69,0.15);color:#dc3545}"}
+</style></head><body>
+<div class="container">
+<a href="/" class="back">← Back to Leaderboard</a>
+<h1>${escapeHtml(s.displayName || s.name)} <span class="grade-badge">${grade}</span></h1>
+<p class="dim">${escapeHtml(s.name)} · ${s.publisher || 'unknown'} · ${s.isOfficial ? '✅ Official' : ''}</p>
+
+<h2>📊 Score Breakdown</h2>
+<div class="card">
+<div class="score-grid">
+  <div class="score-item"><div class="val" style="color:${barColor(correctness)}">${correctness}</div><div class="sm">Schema</div></div>
+  <div class="score-item"><div class="val" style="color:${barColor(efficiency)}">${efficiency}</div><div class="sm">Token Efficiency</div></div>
+  <div class="score-item"><div class="val" style="color:${barColor(descriptionQ)}">${descriptionQ}</div><div class="sm">Description</div></div>
+  <div class="score-item"><div class="val" style="color:${barColor(security)}">${security}</div><div class="sm">Security</div></div>
+  <div class="score-item"><div class="val" style="color:${barColor(installRel)}">${installRel}</div><div class="sm">Install</div></div>
+</div>
+<p class="dim">Overall: <strong>${score}/100</strong> — Grade ${grade}</p>
+${[
+  {label:"Schema",v:correctness},{label:"Token Efficiency",v:efficiency},
+  {label:"Description",v:descriptionQ},{label:"Security",v:security},{label:"Install",v:installRel}
+].map(d => `<div style="margin:8px 0"><span style="font-size:0.85em">${d.label}</span>
+<div class="bar-wrap"><div class="bar-fill" style="width:${d.v}%;background:${barColor(d.v)}"></div></div></div>`).join('')}
+</div>
+
+<h2>💡 Improvement Tips</h2>
+${tips.map(t => `<div class="tip ${t.includes('Great job') ? 'good' : ''}">${t}</div>`).join('')}
+
+<h2>🔗 Resources</h2>
+<div class="card">
+<p class="dim">Badge embed code:</p>
+<code style="background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:8px 12px;display:block;margin:8px 0;font-size:0.85em;color:#7c9ff5;overflow-x:auto">
+[![Grade ${grade}](https://agent-tool-intel-production.up.railway.app/badge/${encodeURIComponent(fullName)})](https://agent-tool-intel-production.up.railway.app)
+</code>
+<p class="dim"><a href="/scoring/methodology" style="color:#7c9ff5">Scoring Methodology</a> · <a href="/roadmap" style="color:#7c9ff5">Roadmap</a></p>
+</div>
+</div></body></html>`;
+  return c.html(html);
+});
+
 // ── Homepage: Leaderboard ──
 
 publicRoute.get("/", async (c) => {

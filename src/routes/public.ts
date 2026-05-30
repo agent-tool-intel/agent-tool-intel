@@ -89,6 +89,118 @@ h2 { font-size:1.2em; margin:32px 0 12px; color:#e0e0e0; }
   return c.html(html);
 });
 
+// ── Scoring Methodology page ──
+
+publicRoute.get("/scoring/methodology", async (c) => {
+  // Get current grade distribution
+  const gradeDist = await db
+    .select({ grade: qualityScores.grade, cnt: sql<number>`count(*)` })
+    .from(qualityScores)
+    .groupBy(qualityScores.grade)
+    .orderBy(qualityScores.grade);
+  const total = gradeDist.reduce((s, g) => s + Number(g.cnt), 0);
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scoring Methodology — Agent Tool Intelligence</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #0a0a0f; color: #e0e0e0; line-height:1.7; padding:40px 20px; }
+.container { max-width:800px; margin:0 auto; }
+h1 { font-size:1.8em; background: linear-gradient(135deg, #7c9ff5, #a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+h2 { font-size:1.2em; margin:32px 0 12px; color:#e0e0e0; border-bottom:1px solid #21262d; padding-bottom:8px; }
+h3 { font-size:1em; margin:16px 0 8px; color:#c0c0c0; }
+p, li { color:#8b949e; margin-bottom:10px; }
+table { width:100%; border-collapse:collapse; margin:12px 0 20px; }
+th, td { padding:10px 14px; text-align:left; border-bottom:1px solid #21262d; }
+th { color:#c0c0c0; font-weight:600; font-size:0.85em; }
+td { font-size:0.9em; }
+code { background:#161b22; border:1px solid #30363d; border-radius:4px; padding:2px 6px; font-size:0.85em; color:#7c9ff5; }
+.back { color:#7c9ff5; text-decoration:none; font-size:0.9em; }
+.bar { display:inline-block; height:14px; border-radius:3px; margin-right:8px; vertical-align:middle; }
+.green { background:#28a745; } .purple { background:#6c75e3; } .orange { background:#ffab00; } .red { background:#dc3545; }
+</style>
+</head>
+<body>
+<div class="container">
+<a href="/" class="back">← Back to Leaderboard</a>
+<h1>Scoring Methodology</h1>
+<p>How we evaluate MCP tools — transparent for builders, actionable for agents.</p>
+
+<h2>Current Grade Distribution</h2>
+<table>
+<tr><th>Grade</th><th>Count</th><th>%</th><th>Distribution</th></tr>
+${gradeDist.map(g => {
+  const pct = ((Number(g.cnt) / total) * 100).toFixed(1);
+  const grade = g.grade || "?";
+  const color = grade.includes("A") ? "green" : grade.includes("B") ? "purple" : grade.includes("C") ? "orange" : "red";
+  return `<tr><td><strong>${grade}</strong></td><td>${Number(g.cnt).toLocaleString()}</td><td>${pct}%</td><td><span class="bar ${color}" style="width:${Math.max(1, Number(pct)) * 3}px"></span></td></tr>`;
+}).join("")}
+</table>
+<p style="color:#8b949e;font-size:0.85em">Total tools scored: ${total.toLocaleString()}</p>
+
+<h2>1. Quality Score (Static Analysis)</h2>
+<p>Five dimensions, automatically evaluated from the tool definition. Weighted composite: 0-100.</p>
+<table>
+<tr><th>Dimension</th><th>Weight</th><th>What we measure</th></tr>
+<tr><td>Schema Correctness</td><td>30%</td><td>Does the tool have a valid input/output schema? JSON Schema structure, type field, properties, required fields.</td></tr>
+<tr><td>Token Efficiency</td><td>25%</td><td>How many tokens does the tool definition consume? Every token counts against the agent's context window. ≤80 tokens = optimal.</td></tr>
+<tr><td>Description Quality</td><td>20%</td><td>Is the description clear, concise, and actionable? Length (50-200 chars optimal), action verbs, naming conventions.</td></tr>
+<tr><td>Security</td><td>15%</td><td>Prompt injection patterns, suspicious language, security keywords. No runtime sandbox yet.</td></tr>
+<tr><td>Install Reliability</td><td>10%</td><td>Can we detect the install method? HTTP endpoint vs npm/pip/go/cargo. Clear install instructions help.</td></tr>
+</table>
+
+<h3>Grade Mapping</h3>
+<table>
+<tr><th>Score Range</th><th>Grade</th><th>Interpretation</th></tr>
+<tr><td>92-100</td><td>A+</td><td>Exceptional quality across all dimensions</td></tr>
+<tr><td>82-91</td><td>A</td><td>Strong quality, minor improvements possible</td></tr>
+<tr><td>74-81</td><td>B+</td><td>Good quality, some dimensions need attention</td></tr>
+<tr><td>66-73</td><td>B</td><td>Solid, with clear improvement areas</td></tr>
+<tr><td>55-65</td><td>C</td><td>Average — functional but needs work</td></tr>
+<tr><td>40-54</td><td>D</td><td>Below average — significant issues</td></tr>
+<tr><td>0-39</td><td>F</td><td>Critical issues — not recommended for agents</td></tr>
+</table>
+
+<h2>2. Trust Score (Real-World Performance)</h2>
+<p>Derived from actual agent usage. Starts at 50 (neutral baseline) and improves as agents report success.</p>
+<table>
+<tr><th>Signal</th><th>Weight</th><th>Source</th></tr>
+<tr><td>Success Rate</td><td>40%</td><td>Reported success/failure from agent calls</td></tr>
+<tr><td>Recency</td><td>25%</td><td>How recently was the tool used? Active tools score higher.</td></tr>
+<tr><td>Consistency</td><td>20%</td><td>Stability of success rate + user ratings</td></tr>
+<tr><td>Community</td><td>15%</td><td>Usage volume + GitHub engagement</td></tr>
+</table>
+
+<h2>3. Agent Signals (Discovery Metadata)</h2>
+<p>Signals that help agents decide whether to trust a tool before calling it.</p>
+<table>
+<tr><th>Signal</th><th>What it means</th></tr>
+<tr><td>Is Official</td><td>Maintained by the service provider or platform organization</td></tr>
+<tr><td>GitHub Stars</td><td>Community endorsement (log-scale scoring)</td></tr>
+<tr><td>Activity Status</td><td>Active (≤30d), Maintained (≤180d), Stale (≤365d), Abandoned (>365d)</td></tr>
+<tr><td>Community Score</td><td>Composite: stars (50%) + activity (35%) + official bonus (15%)</td></tr>
+</table>
+
+<h2>4. Discrepancy Flag</h2>
+<p>When quality and trust contradict each other, we flag it:</p>
+<ul>
+<li><strong>Quality > Trust</strong>: Well-designed but unverified in production. Caution: may work on paper but not battle-tested.</li>
+<li><strong>Trust > Quality</strong>: Widely used despite design issues. Adoption paradox — works in practice but may have maintainability risks.</li>
+</ul>
+
+<h2>5. Continuous Improvement</h2>
+<p>Scores are recalculated periodically. Improving your tool's schemas, descriptions, or install documentation directly improves your Quality Score. Real-world agent usage improves your Trust Score. We're actively calibrating based on ecosystem feedback.</p>
+
+<p style="color:#8b949e;font-size:0.85em;margin-top:30px;">Last updated: ${new Date().toISOString().slice(0, 10)} · <a href="/docs" style="color:#7c9ff5">API Docs</a> · <a href="https://github.com/HMCHENGGH/agent-tool-intel" style="color:#7c9ff5">GitHub</a></p>
+</div>
+</body>
+</html>`;
+  return c.html(html);
+});
+
 // ── Homepage: Leaderboard ──
 
 publicRoute.get("/", async (c) => {

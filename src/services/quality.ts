@@ -190,12 +190,13 @@ function scoreInstall(tool: ToolForScoring, issues: QualityIssue[]): number {
 }
 
 export function scoreToGrade(score: number): string {
-  // Aim for: ~10% A, ~30% B, ~40% C, ~20% D/F
-  if (score >= 92) return "A+";
-  if (score >= 82) return "A";
-  if (score >= 74) return "B+";
-  if (score >= 66) return "B";
-  if (score >= 55) return "C";
-  if (score >= 40) return "D";
+  // Aim for: ~5% A, ~25% B, ~45% C, ~25% D/F
+  // Calibrated against 19K tool population
+  if (score >= 90) return "A+";
+  if (score >= 80) return "A";
+  if (score >= 72) return "B+";
+  if (score >= 64) return "B";
+  if (score >= 52) return "C";
+  if (score >= 38) return "D";
   return "F";
 }

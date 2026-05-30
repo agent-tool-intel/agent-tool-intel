@@ -361,7 +361,7 @@ ${tips.map(t => `<div class="tip ${t.includes('Great job') ? 'good' : ''}">${t}<
 <code style="background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:8px 12px;display:block;margin:8px 0;font-size:0.85em;color:#7c9ff5;overflow-x:auto">
 [![Grade ${grade}](https://agent-tool-intel-production.up.railway.app/badge/${encodeURIComponent(fullName)})](https://agent-tool-intel-production.up.railway.app)
 </code>
-<p class="dim"><a href="/scoring/methodology" style="color:#7c9ff5">Scoring Methodology</a> · <a href="/roadmap" style="color:#7c9ff5">Roadmap</a></p>
+<footer style="text-align:center;padding:20px;color:#484f58;font-size:0.85em;border-top:1px solid #21262d;margin-top:20px"><a href="/" style="color:#7c9ff5">Home</a> · <a href="/docs" style="color:#7c9ff5">API Docs</a> · <a href="/scoring/methodology" style="color:#7c9ff5">Methodology</a> · <a href="/roadmap" style="color:#7c9ff5">Roadmap</a> · <a href="https://github.com/HMCHENGGH/agent-tool-intel" style="color:#7c9ff5">GitHub</a></footer>
 </div>
 </div></body></html>`;
   return c.html(html);
@@ -565,10 +565,10 @@ footer { text-align:center; padding:40px 20px; color:#484f58; font-size:0.85em; 
   <div class="badge-section" style="margin-bottom:24px">
     <h3>🔍 Check Your Tool's Grade</h3>
     <p style="color:#8b949e;margin-bottom:12px">Paste your GitHub repo (e.g. <code>puppeteer/puppeteer</code>) to see your quality grade instantly.</p>
-    <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <form action="/check" method="get" style="display:flex;gap:10px;flex-wrap:wrap">
       <input type="text" name="repo" placeholder="owner/repo" style="flex:1;min-width:200px;background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:12px 16px;color:#e0e0e0;font-size:1em;outline:none">
       <button type="submit" style="background:#6c75e3;border:none;border-radius:8px;padding:12px 20px;color:#fff;font-weight:600;cursor:pointer;font-size:1em">Check</button>
-    </div>
+    </form>
     <div id="check-result" style="margin-top:16px;display:none"></div>
   </div>
 
@@ -579,7 +579,7 @@ footer { text-align:center; padding:40px 20px; color:#484f58; font-size:0.85em; 
     <div class="badge-preview" style="margin:16px 0;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
       <span style="color:#e0e0e0;font-weight:600">puppeteer/puppeteer</span>
       <span style="color:#8b949e">→</span>
-      <img src="/badge/puppeteer%2Fpuppeteer" alt="Grade A" style="height:20px" />
+      <img src="/badge/puppeteer%2Fpuppeteer" alt="Grade" style="height:20px" />
     </div>
     <code>&lt;a href="https://agent-tool-intel-production.up.railway.app"&gt;&lt;img src="https://agent-tool-intel-production.up.railway.app/badge/YOUR_ORG%2FYOUR_REPO" alt="Agent Tool Intel Grade" /&gt;&lt;/a&gt;</code>
     <p style="color:#8b949e;margin-top:10px;font-size:0.85em">Replace <code>YOUR_ORG%2FYOUR_REPO</code> with your server name. <code>/</code> → <code>%2F</code>. Badge auto-updates.</p>

@@ -93,7 +93,18 @@ export const feedback = pgTable("feedback", {
   submittedAt: timestamp("submitted_at", { withTimezone: true }).defaultNow(),
 });
 
-// ── 6. Search Logs ──
+// ── 6. Outreach Log（防止重复发送）──
+
+export const outreachLog = pgTable("outreach_log", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  owner: text("owner").notNull(),           // GitHub owner login（小写）
+  repo: text("repo").notNull(),             // full repo name
+  issueUrl: text("issue_url"),              // created issue URL
+  status: text("status").notNull().default("sent"), // sent / accepted / rejected / spam
+  sentAt: timestamp("sent_at", { withTimezone: true }).defaultNow(),
+});
+
+// ── 7. Search Logs ──
 
 export const searchLogs = pgTable("search_logs", {
   id: uuid("id").defaultRandom().primaryKey(),

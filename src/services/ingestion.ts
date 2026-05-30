@@ -221,7 +221,30 @@ export async function scrapeGitHubMCPTopic(): Promise<ScrapedServer[]> {
       if (seen.has(repo.full_name)) continue;
       seen.add(repo.full_name);
 
+      // Detect install method instead of defaulting to npx
       const desc = repo.description || `${repo.full_name} MCP server`;
+      const lang = repo.language?.toLowerCase() || "";
+      const descLower = desc.toLowerCase();
+      const topicsLower = (repo.topics || []).map((t: string) => t.toLowerCase());
+
+      let installCmd = `npx @${repo.full_name}`;
+      let installType = "npx";
+
+      if (topicsLower.includes("http-mcp") || topicsLower.includes("streamable-http") ||
+          descLower.includes("streamable http") || descLower.includes("http mcp server") ||
+          descLower.includes("remote mcp")) {
+        installCmd = repo.html_url;
+        installType = "http";
+      } else if (lang === "python") {
+        installCmd = `pip install ${repo.full_name.split("/")[1]}`;
+        installType = "pip";
+      } else if (lang === "go" || lang === "golang") {
+        installCmd = `go install github.com/${repo.full_name}@latest`;
+        installType = "go";
+      } else if (lang === "rust") {
+        installCmd = `cargo install ${repo.full_name.split("/")[1]}`;
+        installType = "cargo";
+      }
       const isOfficial =
         repo.owner.login === "modelcontextprotocol" ||
         repo.owner.login === "anthropics" ||

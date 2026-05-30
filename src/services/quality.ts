@@ -20,18 +20,18 @@ export function scoreToolQuality(tool: ToolForScoring): Omit<QualityScore, "id" 
   // 3. Description Quality (20%)
   const descriptionQ = scoreDescription(tool, issues);
 
-  // 4. Security (15%) — basic static checks
+  // 4. Security (15%)
   const security = scoreSecurity(tool, issues);
 
-  // 5. Install Reliability (10%) — placeholder, real data from Docker builds
-  const installRel = 70;
+  // 5. Install Reliability (10%)
+  const installRel = scoreInstall(tool, issues);
 
   const overallScore =
-    correctness * 0.3 +
+    correctness * 0.30 +
     efficiency * 0.25 +
-    descriptionQ * 0.2 +
+    descriptionQ * 0.20 +
     security * 0.15 +
-    installRel * 0.1;
+    installRel * 0.10;
 
   const grade = scoreToGrade(overallScore);
 
@@ -48,139 +48,154 @@ export function scoreToolQuality(tool: ToolForScoring): Omit<QualityScore, "id" 
   };
 }
 
-function scoreCorrectness(
-  tool: ToolForScoring,
-  issues: QualityIssue[]
-): number {
-  let score = 100;
-
+function scoreCorrectness(tool: ToolForScoring, issues: QualityIssue[]): number {
   if (!tool.inputSchema) {
-    score -= 30;
     issues.push({
       type: "correctness",
-      severity: "high",
-      detail: "Missing input schema — agent cannot know expected parameters",
+      severity: "medium",
+      detail: "No input schema detected — agent must rely on description alone",
     });
-  } else {
-    // Check for required fields
-    const schema = tool.inputSchema as Record<string, unknown>;
-    if (!schema.type) {
-      score -= 15;
-      issues.push({
-        type: "correctness",
-        severity: "medium",
-        detail: "Schema missing 'type' field",
-      });
-    }
-    if (!schema.properties || Object.keys(schema.properties as object).length === 0) {
-      score -= 10;
-      issues.push({
-        type: "correctness",
-        severity: "low",
-        detail: "Schema has no properties defined",
-      });
-    }
+    return 50; // Neutral — many MCP tools use natural language params, not JSON Schema
   }
 
-  return Math.max(0, score);
+  let score = 70;
+  const schema = tool.inputSchema as Record<string, unknown>;
+
+  if (!schema.type) {
+    score -= 15;
+    issues.push({ type: "correctness", severity: "medium", detail: "Schema missing 'type' field" });
+  }
+
+  if (!schema.properties || Object.keys(schema.properties as object).length === 0) {
+    score -= 10;
+    issues.push({ type: "correctness", severity: "low", detail: "Schema has no properties — may use implicit parameters" });
+  }
+
+  if (schema.properties && Object.keys(schema.properties as object).length >= 2) {
+    score += 15;
+    if (schema.required) score += 10; // Well-structured
+  }
+
+  return Math.max(0, Math.min(100, score));
 }
 
-function scoreEfficiency(
-  tool: ToolForScoring,
-  issues: QualityIssue[]
-): number {
-  const tokens = tool.tokenCount ?? 500;
+function scoreEfficiency(tool: ToolForScoring, issues: QualityIssue[]): number {
+  const tokens = tool.tokenCount ?? 500; // Default to moderate
 
-  if (tokens <= 200) return 100;
-  if (tokens <= 500) return 80;
-  if (tokens <= 1000) return 60;
+  // Much tighter thresholds
+  if (tokens <= 80) return 100;       // Extremely efficient
+  if (tokens <= 150) return 85;        // Very efficient
+  if (tokens <= 250) return 70;        // Efficient
+  if (tokens <= 400) return 55;        // Acceptable
+  if (tokens <= 600) return 40;        // Heavy
 
-  issues.push({
-    type: "efficiency",
-    severity: "high",
-    detail: `Tool definition uses ${tokens} tokens (>1000), consuming significant context window`,
-  });
-  return 30;
+  issues.push({ type: "efficiency", severity: "high", detail: `${tokens} tokens — consumes significant context` });
+  return 25; // Very heavy
 }
 
-function scoreDescription(
-  tool: ToolForScoring,
-  issues: QualityIssue[]
-): number {
-  let score = 100;
+function scoreDescription(tool: ToolForScoring, issues: QualityIssue[]): number {
+  let score = 65; // Start slightly above neutral
   const desc = tool.description;
   const len = desc.length;
 
-  // Optimal length: 30-200 chars
-  if (len < 10) {
+  // Length
+  if (len < 20) {
     score -= 40;
-    issues.push({
-      type: "description",
-      severity: "critical",
-      detail: `Description too short (${len} chars) — agent cannot understand purpose`,
-    });
-  } else if (len > 500) {
-    score -= 30;
-    issues.push({
-      type: "description",
-      severity: "high",
-      detail: `Description too long (${len} chars) — likely contains embedded documentation`,
-    });
-  } else if (len > 200) {
-    score -= 10;
-  }
-
-  // Check for naming conventions
-  if (!/^[a-z][a-z0-9_]*$/.test(tool.name)) {
+    issues.push({ type: "description", severity: "critical", detail: `Too short (${len} chars) — agent cannot understand purpose` });
+  } else if (len < 50) {
     score -= 15;
-    issues.push({
-      type: "description",
-      severity: "medium",
-      detail: `Tool name "${tool.name}" does not follow snake_case convention`,
-    });
+    issues.push({ type: "description", severity: "low", detail: `Short (${len} chars) — could use more detail` });
+  } else if (len >= 50 && len <= 200) {
+    score += 15; // Optimal length
+  } else if (len > 400) {
+    score -= 20;
+    issues.push({ type: "description", severity: "medium", detail: `Too long (${len} chars) — likely embedded documentation` });
   }
 
-  return Math.max(0, score);
+  // Action verbs check (more strict)
+  const actionVerbs = /\b(read|write|query|search|fetch|extract|create|update|delete|list|get|post|execute|run|connect|send|download|upload|manage|control|monitor|track|analyze|generate|build|test|deploy|configure|install|parse|convert|transform|validate|check|verify|scan|audit|optimize|schedule|notify|alert)\b/i;
+  if (actionVerbs.test(desc)) {
+    score += 10;
+  } else {
+    score -= 5;
+    issues.push({ type: "description", severity: "low", detail: "No clear action verbs — what does this tool actually do?" });
+  }
+
+  // Naming convention
+  if (/^[a-z][a-z0-9_]*$/.test(tool.name)) {
+    score += 5;
+  } else {
+    score -= 10;
+    issues.push({ type: "description", severity: "medium", detail: `Name "${tool.name}" should use snake_case` });
+  }
+
+  // Has concrete examples in description?
+  if (/example|usage|e\.g\.|such as|like|for instance/i.test(desc)) {
+    score += 5;
+  }
+
+  return Math.max(0, Math.min(100, score));
 }
 
-function scoreSecurity(
-  tool: ToolForScoring,
-  issues: QualityIssue[]
-): number {
-  let score = 100;
+function scoreSecurity(tool: ToolForScoring, issues: QualityIssue[]): number {
+  let score = 75; // Start neutral
   const desc = tool.description.toLowerCase();
 
-  // Check for prompt injection patterns
-  const suspiciousPatterns = [
-    "ignore previous",
-    "override your",
-    "silently",
-    "do not tell",
-    "pretend you are",
-    "always respond with",
-  ];
-
-  for (const pattern of suspiciousPatterns) {
+  // Critical: prompt injection patterns
+  const criticalPatterns = ["ignore previous", "override your", "silently remember", "do not tell", "pretend you are", "always respond with"];
+  for (const pattern of criticalPatterns) {
     if (desc.includes(pattern)) {
-      score -= 40;
-      issues.push({
-        type: "security",
-        severity: "critical",
-        detail: `Prompt injection pattern detected in description: "${pattern}"`,
-      });
-      break;
+      score -= 50;
+      issues.push({ type: "security", severity: "critical", detail: `Prompt injection detected: "${pattern}"` });
+      return Math.max(0, score);
     }
   }
 
-  return Math.max(0, score);
+  // Medium concern patterns
+  const mediumPatterns = ["without telling", "secretly", "hidden from user", "bypass", "backdoor"];
+  for (const pattern of mediumPatterns) {
+    if (desc.includes(pattern)) {
+      score -= 25;
+      issues.push({ type: "security", severity: "high", detail: `Suspicious pattern: "${pattern}"` });
+    }
+  }
+
+  // Has explicit security mention = good sign
+  if (/security|auth|authenticate|encrypt|sandbox|isolated|permission/i.test(desc)) {
+    score += 10;
+  }
+
+  return Math.max(0, Math.min(100, score));
+}
+
+function scoreInstall(tool: ToolForScoring, issues: QualityIssue[]): number {
+  // Can't know install method without metadata — start lower
+  // The ingestion pipeline provides installCmd and installType
+  // If we're here without that data, score is uncertain
+  let score = 50;
+
+  // Name might indicate install method
+  if (/^npm:|npx /i.test(tool.name)) {
+    score += 20;
+  } else if (/^pypi:|pip /i.test(tool.name)) {
+    score += 20;
+  }
+
+  // Description mentions install
+  if (/npm install|pip install|docker pull|npx |go install/i.test(tool.description)) {
+    score += 15;
+  }
+
+  return Math.max(0, Math.min(100, score));
 }
 
 export function scoreToGrade(score: number): string {
-  if (score >= 95) return "A+";
-  if (score >= 85) return "A";
-  if (score >= 80) return "B+";
-  if (score >= 75) return "B";
-  if (score >= 70) return "C";
-  if (score >= 60) return "D";
+  // Aim for: ~10% A, ~30% B, ~40% C, ~20% D/F
+  if (score >= 92) return "A+";
+  if (score >= 82) return "A";
+  if (score >= 74) return "B+";
+  if (score >= 66) return "B";
+  if (score >= 55) return "C";
+  if (score >= 40) return "D";
   return "F";
 }

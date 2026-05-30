@@ -189,6 +189,13 @@ export interface SearchResultTool {
   };
   // Community score (human-generated signals)
   communityScore: number;
+  // Trust Tier: composite of quality + trust + activity + community
+  trustTier: {
+    tier: "premium" | "verified" | "reliable" | "emerging" | "caution" | "deprecated";
+    label: string;
+    icon: string;
+    description: string;
+  };
   // Flags quality-trust contradiction for agent & human awareness
   discrepancy?: {
     type: "quality_beats_trust" | "trust_beats_quality" | "none";

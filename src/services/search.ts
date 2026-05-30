@@ -222,6 +222,12 @@ export async function searchTools(params: SearchParams): Promise<SearchResponse>
         ),
         agentSignals: buildAgentSignals(row),
         communityScore: calcCommunityScore(row),
+        trustTier: getTrustTier(
+          quality?.grade ?? "C", qualityScore, trustScore,
+          row.is_official === true,
+          buildAgentSignals(row)?.activityStatus ?? "maintained",
+          (row.server_metadata as any)?.github_stars ?? 0
+        ),
         discrepancy: getDiscrepancy(qualityScore, trustScore, quality?.grade ?? "C"),
       };
     })
@@ -246,6 +252,38 @@ export async function searchTools(params: SearchParams): Promise<SearchResponse>
     results: searchResults,
     topPick,
   };
+}
+
+function getTrustTier(
+  qualityGrade: string,
+  qualityScore: number,
+  trustScore: number,
+  isOfficial: boolean,
+  activityStatus: string,
+  githubStars: number
+): SearchResultTool["trustTier"] {
+  // Premium: A grade, 50+ stars, active, trust ≥ 80
+  if ((qualityGrade.startsWith("A") || qualityGrade === "A+") && githubStars >= 50 && activityStatus === "active" && trustScore >= 80) {
+    return { tier: "premium", label: "Premium", icon: "🔥", description: "Top-tier: excellent quality, highly active, trusted by the community" };
+  }
+  // Verified: Official + active + trust ≥ 60
+  if (isOfficial && activityStatus !== "abandoned" && trustScore >= 60) {
+    return { tier: "verified", label: "Verified", icon: "✅", description: "Official maintainer, active development, proven reliability" };
+  }
+  // Reliable: B+ or above, active, trust ≥ 50
+  if (["A+","A","B+"].some(g => qualityGrade.startsWith(g)) && activityStatus !== "abandoned" && trustScore >= 50) {
+    return { tier: "reliable", label: "Reliable", icon: "👍", description: "Good quality, active, community-endorsed" };
+  }
+  // Deprecated: abandoned or F grade
+  if (activityStatus === "abandoned" || qualityGrade === "F") {
+    return { tier: "deprecated", label: "Deprecated", icon: "💀", description: "Abandoned or critically flawed — not recommended" };
+  }
+  // Caution: low trust (<50) or stale (>180d)
+  if (trustScore < 50 || activityStatus === "stale") {
+    return { tier: "caution", label: "Caution", icon: "⚠️", description: "Low trust score or stale — verify before using" };
+  }
+  // Emerging: active but new
+  return { tier: "emerging", label: "Emerging", icon: "🌱", description: "New and active — promising but not yet proven" };
 }
 
 function getDiscrepancy(

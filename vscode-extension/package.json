@@ -1,0 +1,49 @@
+{
+  "name": "agent-tool-intel",
+  "displayName": "Agent Tool Intel",
+  "description": "Show MCP server quality grade in your editor. Powered by Agent Tool Intelligence.",
+  "version": "0.1.0",
+  "publisher": "HMCHENGGH",
+  "icon": "icon.png",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["Other", "Linters"],
+  "keywords": ["mcp", "agent", "quality", "grade", "score"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "agentToolIntel.checkGrade",
+        "title": "Agent Tool Intel: Check Grade"
+      },
+      {
+        "command": "agentToolIntel.openDashboard",
+        "title": "Agent Tool Intel: Open Health Dashboard"
+      }
+    ],
+    "configuration": {
+      "title": "Agent Tool Intel",
+      "properties": {
+        "agentToolIntel.repoName": {
+          "type": "string",
+          "description": "GitHub repo name (owner/repo) to check. Auto-detected from git remote if blank."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.7.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HMCHENGGH/agent-tool-intel"
+  },
+  "license": "MIT"
+}

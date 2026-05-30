@@ -189,14 +189,20 @@ export interface SearchResultTool {
   };
   // Community score (human-generated signals)
   communityScore: number;
-  // Trust Tier: composite of quality + trust + activity + community
+  // Trust Tier
   trustTier: {
     tier: "premium" | "verified" | "reliable" | "emerging" | "caution" | "deprecated";
     label: string;
     icon: string;
     description: string;
   };
-  // Flags quality-trust contradiction for agent & human awareness
+  // Data provenance: marks data source quality
+  dataProvenance: {
+    qualityScore: "real" | "estimated" | "unknown";
+    trustScore: "real_feedback" | "federated" | "simulated" | "baseline";
+    communityScore: "live" | "cached" | "unknown";
+  };
+  // Flags quality-trust contradiction
   discrepancy?: {
     type: "quality_beats_trust" | "trust_beats_quality" | "none";
     severity: "warning" | "caution" | "info";

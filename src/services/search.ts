@@ -222,6 +222,11 @@ export async function searchTools(params: SearchParams): Promise<SearchResponse>
         ),
         agentSignals: buildAgentSignals(row),
         communityScore: calcCommunityScore(row),
+        dataProvenance: {
+          qualityScore: (quality ? "real" : "estimated") as "real" | "estimated",
+          trustScore: (fb?.totalCalls && fb.totalCalls > 0 ? "simulated" : "baseline") as "real_feedback" | "federated" | "simulated" | "baseline",
+          communityScore: (row.server_metadata ? "live" : "unknown") as "live" | "cached" | "unknown",
+        },
         trustTier: getTrustTier(
           quality?.grade ?? "C", qualityScore, trustScore,
           row.is_official === true,

@@ -201,6 +201,101 @@ ${gradeDist.map(g => {
   return c.html(html);
 });
 
+// ── Public Roadmap ──
+
+publicRoute.get("/roadmap", (c) => {
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roadmap — Agent Tool Intelligence</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #0a0a0f; color: #e0e0e0; line-height:1.7; padding:40px 20px; }
+.container { max-width:800px; margin:0 auto; }
+h1 { font-size:1.8em; background: linear-gradient(135deg, #7c9ff5, #a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+h2 { font-size:1.2em; margin:32px 0 12px; border-bottom:1px solid #21262d; padding-bottom:8px; }
+.phase { background:#161b22; border:1px solid #30363d; border-radius:8px; padding:20px; margin-bottom:16px; }
+.phase h3 { margin-bottom:8px; }
+.done { color:#28a745; } .wip { color:#ffab00; } .planned { color:#6c75e3; }
+.check { color:#28a745; margin-right:8px; }
+ul { list-style:none; padding:0; }
+li { color:#8b949e; padding:4px 0; font-size:0.9em; }
+.back { color:#7c9ff5; text-decoration:none; font-size:0.9em; }
+</style>
+</head>
+<body>
+<div class="container">
+<a href="/" class="back">← Back</a>
+<h1>Public Roadmap</h1>
+<p style="color:#8b949e;margin-bottom:24px">What we're building and when. Updated as we ship.</p>
+
+<div class="phase">
+<h3 class="done">✅ Phase 1 — Foundation (Complete)</h3>
+<ul>
+<li><span class="check">✓</span>Semantic search across MCP ecosystem</li>
+<li><span class="check">✓</span>Automated quality scoring (5 dimensions)</li>
+<li><span class="check">✓</span>Trust engine with feedback loop</li>
+<li><span class="check">✓</span>Grade badges for GitHub README</li>
+<li><span class="check">✓</span>Public API + documentation</li>
+<li><span class="check">✓</span>19,000+ MCP servers indexed</li>
+</ul>
+</div>
+
+<div class="phase">
+<h3 class="wip">🔧 Phase A — Build Trust (In Progress)</h3>
+<ul>
+<li><span class="check">✓</span>Scoring calibration (meaningful distribution)</li>
+<li><span class="check">✓</span>Methodology page (transparent scoring docs)</li>
+<li><span class="check">✓</span>Trust Tier System (Premium/Verified/Reliable/Emerging/Caution/Deprecated)</li>
+<li><span class="check">✓</span>Data Provenance (real vs simulated vs baseline)</li>
+<li><span class="check">✓</span>Self-Check Tool (paste URL → instant grade)</li>
+<li><span class="check">✓</span>Outreach Guard (zero duplicates)</li>
+<li>Activity Transparency on tool pages</li>
+<li>Verified Maintainer Badge</li>
+<li>Tool Health Dashboard for builders</li>
+<li>Featured Weekly (curated picks)</li>
+</ul>
+</div>
+
+<div class="phase">
+<h3 class="planned">📋 Phase B — Spread (Planned)</h3>
+<ul>
+<li>GitHub Action (auto-grade on push/release)</li>
+<li>Weekly Top 10 MCP Tools content</li>
+<li>npm badge auto-display</li>
+<li>VS Code Extension (grade in editor)</li>
+<li>Deepen partner network (5-10 Aigen-level partners)</li>
+</ul>
+</div>
+
+<div class="phase">
+<h3 class="planned">🚀 Phase 3 — TaaS: Tool-as-a-Service</h3>
+<ul>
+<li>Execution Gateway (platform runs tools for agents)</li>
+<li>Sandbox execution with security isolation</li>
+<li>Result caching for common operations</li>
+<li>Trust score from real execution data</li>
+</ul>
+</div>
+
+<div class="phase">
+<h3 class="planned">💎 Phase 4 — Marketplace</h3>
+<ul>
+<li>Per-call billing for tool execution</li>
+<li>Builder revenue share (platform takes %)</li>
+<li>Agent spending budgets</li>
+<li>Public tool marketplace</li>
+</ul>
+</div>
+
+<p style="color:#8b949e;font-size:0.85em;margin-top:30px;">Last updated: ${new Date().toISOString().slice(0, 10)} · Built in the open · <a href="https://github.com/HMCHENGGH/agent-tool-intel" style="color:#7c9ff5">GitHub</a></p>
+</div>
+</body>
+</html>`;
+  return c.html(html);
+});
+
 // ── Homepage: Leaderboard ──
 
 publicRoute.get("/", async (c) => {

@@ -587,8 +587,8 @@ footer { text-align:center; padding:40px 20px; color:#484f58; font-size:0.85em; 
 </div>
 
 <footer>
-  Agent Tool Intelligence v0.1.0 · <a href="https://github.com/HMCHENGGH/agent-tool-intel">GitHub</a> · API endpoint: agent-tool-intel-production.up.railway.app
-  <br><br>Built for agents. Transparent for humans.
+  <a href="/">Home</a> · <a href="/docs">API Docs</a> · <a href="/scoring/methodology">Methodology</a> · <a href="/roadmap">Roadmap</a> · <a href="https://github.com/HMCHENGGH/agent-tool-intel">GitHub</a>
+  <br><br>Agent Tool Intelligence v0.1.0 · Built for agents. Transparent for humans.
 </footer>
 
 <script>

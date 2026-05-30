@@ -448,6 +448,22 @@ footer { text-align:center; padding:40px 20px; color:#484f58; font-size:0.85em; 
     `).join('')}
   </div>
 
+  <!-- Featured Weekly -->
+  ${(() => {
+    // Pick featured: top quality + active, hidden gem, most improved
+    const featured: string[] = [];
+    if (topTools[0]) featured.push(`<strong>🔥 Top Tool:</strong> ${escapeHtml(topTools[0].toolName || '')} <span style="color:#8b949e">(${topTools[0].serverName})</span> — Grade ${topTools[0].qualityGrade}`);
+    if (topTools[5]) featured.push(`<strong>💎 Hidden Gem:</strong> ${escapeHtml(topTools[5].toolName || '')} <span style="color:#8b949e">(${topTools[5].serverName})</span> — Grade ${topTools[5].qualityGrade}, underrated`);
+    if (topTools[3]) featured.push(`<strong>⭐ Standout:</strong> ${escapeHtml(topTools[3].toolName || '')} <span style="color:#8b949e">(${topTools[3].serverName})</span> — Grade ${topTools[3].qualityGrade}, strong signals`);
+    return featured.length > 0
+      ? `<div class="badge-section" style="margin-bottom:24px;padding:16px 24px">
+        <h3 style="margin-bottom:12px">📣 Featured This Week</h3>
+        ${featured.map(f => `<p style="margin:6px 0;font-size:0.95em">${f}</p>`).join('')}
+        <p style="color:#8b949e;font-size:0.8em;margin-top:8px">Updated weekly · <a href="/scoring/methodology" style="color:#7c9ff5">How scores work</a></p>
+      </div>`
+      : '';
+  })()}
+
   <!-- Leaderboard -->
   <div class="leaderboard">
     <h2>Top Rated Tools</h2>

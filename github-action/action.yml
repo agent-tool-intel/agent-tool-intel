@@ -1,0 +1,52 @@
+name: 'Agent Tool Intel — Grade Check'
+description: 'Auto-check your MCP server grade on every push. Posts grade badge and improvement tips.'
+author: 'HMCHENGGH'
+
+branding:
+  icon: 'award'
+  color: 'purple'
+
+inputs:
+  repo:
+    description: 'GitHub repo name (owner/repo). Defaults to current repository.'
+    required: false
+    default: ${{ github.repository }}
+  token:
+    description: 'GitHub token for commenting'
+    required: false
+    default: ${{ github.token }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Get Grade from Agent Tool Intel
+      id: grade
+      shell: bash
+      run: |
+        REPO="${{ inputs.repo }}"
+        ENCODED=$(echo "$REPO" | sed 's|/|%2F|g')
+        RESPONSE=$(curl -s "https://agent-tool-intel-production.up.railway.app/badge/$ENCODED")
+        GRADE=$(echo "$RESPONSE" | grep -oP 'Grade \K[A-F]\+?')
+        SCORE=$(echo "$RESPONSE" | grep -oP '\(\K\d+' | head -1)
+        echo "grade=$GRADE" >> $GITHUB_OUTPUT
+        echo "score=$SCORE" >> $GITHUB_OUTPUT
+        echo "repo=$REPO" >> $GITHUB_OUTPUT
+        echo "Grade: $GRADE ($SCORE/100)"
+
+    - name: Post Grade Summary
+      if: success() && steps.grade.outputs.grade != ''
+      shell: bash
+      run: |
+        GRADE="${{ steps.grade.outputs.grade }}"
+        SCORE="${{ steps.grade.outputs.score }}"
+        REPO="${{ steps.grade.outputs.repo }}"
+        ENCODED=$(echo "$REPO" | sed 's|/|%2F|g')
+        BADGE_URL="https://agent-tool-intel-production.up.railway.app/badge/$ENCODED"
+        LANDING_URL="https://agent-tool-intel-production.up.railway.app/health/$REPO"
+
+        echo "## 🏷️ Agent Tool Intel Grade" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "![Grade $GRADE]($BADGE_URL)" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Grade:** $GRADE ($SCORE/100)" >> $GITHUB_STEP_SUMMARY
+        echo "**Full Report:** $LANDING_URL" >> $GITHUB_STEP_SUMMARY

@@ -371,6 +371,17 @@ footer { text-align:center; padding:40px 20px; color:#484f58; font-size:0.85em; 
     `).join('')}
   </div>
 
+  <!-- Self-Check Tool -->
+  <div class="badge-section" style="margin-bottom:24px">
+    <h3>🔍 Check Your Tool's Grade</h3>
+    <p style="color:#8b949e;margin-bottom:12px">Paste your GitHub repo (e.g. <code>puppeteer/puppeteer</code>) to see your quality grade instantly.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <input type="text" id="check-input" placeholder="owner/repo" style="flex:1;min-width:200px;background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:12px 16px;color:#e0e0e0;font-size:1em;outline:none" onkeydown="if(event.key==='Enter')checkGrade()">
+      <button onclick="checkGrade()" style="background:#6c75e3;border:none;border-radius:8px;padding:12px 20px;color:#fff;font-weight:600;cursor:pointer;font-size:1em">Check</button>
+    </div>
+    <div id="check-result" style="margin-top:16px;display:none"></div>
+  </div>
+
   <!-- Badge Section -->
   <div class="badge-section">
     <h3>🏷️ Get Your Grade Badge</h3>
@@ -430,6 +441,39 @@ async function doSearch() {
   }
 }
 function escapeH(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+async function checkGrade() {
+  const input = document.getElementById('check-input').value.trim();
+  const div = document.getElementById('check-result');
+  if (!input) return;
+  div.style.display = 'block';
+  div.innerHTML = '<p style="color:#8b949e">Checking...</p>';
+
+  try {
+    const resp = await fetch('/badge/' + encodeURIComponent(input));
+    const svg = await resp.text();
+    const gradeMatch = svg.match(/Grade ([A-F]\+?)/);
+    if (!gradeMatch) {
+      div.innerHTML = '<p style="color:#ffab00">Tool not yet indexed. <a href="/docs" style="color:#7c9ff5">Submit it?</a></p>';
+      return;
+    }
+    const grade = gradeMatch[1];
+    const scoreMatch = svg.match(/\((\d+)\/100\)/);
+    const score = scoreMatch ? scoreMatch[1] : '?';
+    const encoded = encodeURIComponent(input);
+    const badgeUrl = '/badge/' + encoded;
+    const landingUrl = window.location.origin;
+    const md = '[![Grade ' + grade + '](' + landingUrl + badgeUrl + ')](' + landingUrl + ')';
+    div.innerHTML = '<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">' +
+      '<img src="' + badgeUrl + '" alt="Grade ' + grade + '" style="height:20px">' +
+      '<span style="color:#e0e0e0">Score: <strong>' + score + '/100</strong></span>' +
+      '</div>' +
+      '<p style="color:#8b949e;margin-top:12px;font-size:0.9em">Embed this badge on your GitHub README:</p>' +
+      '<code>' + md.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</code>';
+  } catch(e) {
+    div.innerHTML = '<p style="color:#dc3545">Check failed. Try again.</p>';
+  }
+}
 </script>
 </body>
 </html>`;

@@ -564,11 +564,12 @@ footer { text-align:center; padding:40px 20px; color:#484f58; font-size:0.85em; 
   <!-- Self-Check Tool -->
   <div class="badge-section" style="margin-bottom:24px">
     <h3>🔍 Check Your Tool's Grade</h3>
-    <p style="color:#8b949e;margin-bottom:12px">Paste your GitHub repo (e.g. <code>puppeteer/puppeteer</code>) to see your quality grade instantly.</p>
+    <p style="color:#8b949e;margin-bottom:12px">Paste your GitHub repo to get a <strong>full health dashboard</strong> — score breakdown, improvement tips, badge embed code, and Trust Tier.</p>
     <form action="/check" method="get" style="display:flex;gap:10px;flex-wrap:wrap">
       <input type="text" name="repo" placeholder="owner/repo" style="flex:1;min-width:200px;background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:12px 16px;color:#e0e0e0;font-size:1em;outline:none">
       <button type="submit" style="background:#6c75e3;border:none;border-radius:8px;padding:12px 20px;color:#fff;font-weight:600;cursor:pointer;font-size:1em">Check</button>
     </form>
+    <p style="color:#484f58;font-size:0.8em;margin-top:6px">Opens your Tool Health Dashboard with detailed score breakdown & actionable improvement tips.</p>
     <div id="check-result" style="margin-top:16px;display:none"></div>
   </div>
 

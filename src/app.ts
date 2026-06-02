@@ -4,6 +4,7 @@ import { searchRoute } from "./routes/search.js";
 import { toolsRoute } from "./routes/tools.js";
 import { testRoute } from "./routes/test.js";
 import { feedbackRoute } from "./routes/feedback.js";
+import { executeRoute } from "./routes/execute.js";
 import { publicRoute } from "./routes/public.js";
 
 const app = new Hono();
@@ -21,5 +22,6 @@ app.route("/api/v1", searchRoute);
 app.route("/api/v1", toolsRoute);
 app.route("/api/v1", testRoute);
 app.route("/api/v1", feedbackRoute);
+app.route("/api/v1", executeRoute);
 
 export default app;

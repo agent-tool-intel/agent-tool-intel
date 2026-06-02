@@ -194,7 +194,7 @@ ${gradeDist.map(g => {
 <h2>5. Continuous Improvement</h2>
 <p>Scores are recalculated periodically. Improving your tool's schemas, descriptions, or install documentation directly improves your Quality Score. Real-world agent usage improves your Trust Score. We're actively calibrating based on ecosystem feedback.</p>
 
-<p style="color:#8b949e;font-size:0.85em;margin-top:30px;">Last updated: ${new Date().toISOString().slice(0, 10)}</p><footer style="text-align:center;padding:20px;color:#484f58;font-size:0.85em;border-top:1px solid #21262d;margin-top:20px"><a href="/" style="color:#7c9ff5">Home</a> · <a href="/docs" style="color:#7c9ff5">API Docs</a> · <a href="/scoring/methodology" style="color:#7c9ff5">Methodology</a> · <a href="/roadmap" style="color:#7c9ff5">Roadmap</a> · <a href="https://github.com/HMCHENGGH/agent-tool-intel" style="color:#7c9ff5">GitHub</a></footer>
+<p style="color:#8b949e;font-size:0.85em;margin-top:30px;">Last updated: ${new Date().toISOString().slice(0, 10)}</p><footer style="text-align:center;padding:20px;color:#484f58;font-size:0.85em;border-top:1px solid #21262d;margin-top:20px"><a href="/" style="color:#7c9ff5">Home</a> · <a href="/docs" style="color:#7c9ff5">API Docs</a> · <a href="/scoring/methodology" style="color:#7c9ff5">Methodology</a> · <a href="/roadmap" style="color:#7c9ff5">Roadmap</a> · <a href="/partners" style="color:#7c9ff5">Partners</a> · <a href="https://github.com/HMCHENGGH/agent-tool-intel" style="color:#7c9ff5">GitHub</a></footer>
 </div>
 </body>
 </html>`;
@@ -361,9 +361,62 @@ ${tips.map(t => `<div class="tip ${t.includes('Great job') ? 'good' : ''}">${t}<
 <code style="background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:8px 12px;display:block;margin:8px 0;font-size:0.85em;color:#7c9ff5;overflow-x:auto">
 [![Grade ${grade}](https://agent-tool-intel-production.up.railway.app/badge/${encodeURIComponent(fullName)})](https://agent-tool-intel-production.up.railway.app)
 </code>
-<footer style="text-align:center;padding:20px;color:#484f58;font-size:0.85em;border-top:1px solid #21262d;margin-top:20px"><a href="/" style="color:#7c9ff5">Home</a> · <a href="/docs" style="color:#7c9ff5">API Docs</a> · <a href="/scoring/methodology" style="color:#7c9ff5">Methodology</a> · <a href="/roadmap" style="color:#7c9ff5">Roadmap</a> · <a href="https://github.com/HMCHENGGH/agent-tool-intel" style="color:#7c9ff5">GitHub</a></footer>
+<footer style="text-align:center;padding:20px;color:#484f58;font-size:0.85em;border-top:1px solid #21262d;margin-top:20px"><a href="/" style="color:#7c9ff5">Home</a> · <a href="/docs" style="color:#7c9ff5">API Docs</a> · <a href="/scoring/methodology" style="color:#7c9ff5">Methodology</a> · <a href="/roadmap" style="color:#7c9ff5">Roadmap</a> · <a href="/partners" style="color:#7c9ff5">Partners</a> · <a href="https://github.com/HMCHENGGH/agent-tool-intel" style="color:#7c9ff5">GitHub</a></footer>
 </div>
 </div></body></html>`;
+  return c.html(html);
+});
+
+// ── Partners page ──
+
+publicRoute.get("/partners", (c) => {
+  const html = `<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Partners — Agent Tool Intelligence</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #0a0a0f; color: #e0e0e0; line-height:1.7; padding:40px 20px; }
+.container { max-width:800px; margin:0 auto; }
+h1 { font-size:1.8em; background: linear-gradient(135deg, #7c9ff5, #a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+h2 { font-size:1.2em; margin:32px 0 12px; border-bottom:1px solid #21262d; padding-bottom:8px; }
+.card { background:#161b22; border:1px solid #30363d; border-radius:8px; padding:20px; margin-bottom:16px; }
+.card h3 { color:#e0e0e0; } .card p { color:#8b949e; font-size:0.9em; margin:8px 0; }
+code { background:#0d1117; border:1px solid #30363d; border-radius:4px; padding:2px 6px; font-size:0.85em; color:#7c9ff5; }
+.back { color:#7c9ff5; text-decoration:none; font-size:0.9em; }
+.benefit { display:flex; gap:12px; align-items:flex-start; margin:12px 0; }
+.benefit .icon { font-size:1.2em; min-width:24px; }
+</style>
+</head><body>
+<div class="container">
+<a href="/" class="back">← Back</a>
+<h1>Partners</h1>
+<p style="color:#8b949e;margin-bottom:24px">Deepen trust with real-world data. Join the growing network of tools feeding verified usage signals into Agent Tool Intelligence.</p>
+
+<h2>Why Partner?</h2>
+<div class="card">
+<div class="benefit"><span class="icon">📊</span><div><strong>Real Trust Scores</strong><p>Replace the baseline 50/100 Trust Score with your actual success rates. Agents trust tools with verified data significantly more than unverified ones.</p></div></div>
+<div class="benefit"><span class="icon">🏷️</span><div><strong>Better Badge Grade</strong><p>Higher trust scores = higher composite grade = more agents choose your tool. Real data directly improves your badge.</p></div></div>
+<div class="benefit"><span class="icon">🔗</span><div><strong>Cross-Link in Docs</strong><p>We'll list you as a verified partner on this page, with your grade, stats, and link to your tool.</p></div></div>
+<div class="benefit"><span class="icon">🎯</span><div><strong>Influence Scoring</strong><p>Partner feedback shapes our scoring calibration. Your real-world data makes the entire platform more accurate for everyone.</p></div></div>
+</div>
+
+<h2>How It Works</h2>
+<div class="card">
+<p><strong>1.</strong> You POST your tool's usage data to our API:</p>
+<code>POST /api/v1/feedback<br>Body: { "toolId": "tool:mcp:your-org/your-repo@latest", "result": "success", "rating": 5, "notes": "Daily batch — 200 calls today" }</code>
+<p style="margin-top:12px"><strong>2.</strong> We recalculate your Trust Score within 1 hour.</p>
+<p><strong>3.</strong> Your badge, grade, and trust tier auto-update across all surfaces (GitHub, npm, VS Code).</p>
+</div>
+
+<h2>Current Partners</h2>
+<div class="card"><h3>🔬 Aigen Protocol</h3>
+<p>~2,000 MCP sessions/day across 7 tools. Federation data: agent-card.json, leaderboard, mission validation. First partner to integrate real on-chain verified data.</p>
+<p style="margin-top:8px"><a href="https://agent-tool-intel-production.up.railway.app/health/Aigen-Protocol/aigen-protocol" style="color:#7c9ff5">View Health Dashboard →</a></p>
+</div>
+
+<p style="color:#8b949e;font-size:0.85em;margin-top:30px">Interested in becoming a partner? <a href="https://github.com/HMCHENGGH/agent-tool-intel" style="color:#7c9ff5">Open an issue</a> or contact us.</p>
+</div>
+</body></html>`;
   return c.html(html);
 });
 

@@ -117,6 +117,10 @@ export const SearchRequestSchema = z.object({
       maxTokensPerCall: z.number().optional(),
       requireSandboxVerified: z.boolean().optional(),
       sideEffects: z.array(z.string()).optional(),
+	      minGrade: z.string().optional(),
+	      requireActive: z.boolean().optional(),
+	      minStars: z.number().optional(),
+	      excludeDeadProjects: z.boolean().optional(),
     })
     .optional(),
 });
@@ -191,6 +195,10 @@ export interface SearchResultTool {
   };
   // Community score (human-generated signals)
   communityScore: number;
+  category?: string;
+  isDeadProject?: boolean;
+  // Tool category（auto-detected）
+  
   // Trust Tier
   trustTier: {
     tier: "premium" | "verified" | "reliable" | "emerging" | "caution" | "deprecated";

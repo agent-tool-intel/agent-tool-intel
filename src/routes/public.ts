@@ -563,6 +563,18 @@ footer { text-align:center; padding:40px 20px; color:#484f58; font-size:0.85em; 
 <div class="container">
   <!-- Search -->
   <h2 style="margin-bottom:12px">Search Tools</h2>
+  <!-- Category Quick Browse -->
+  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px">
+    <button onclick="doSearch('database')" style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:6px 14px;color:#8b949e;cursor:pointer;font-size:0.85em">🗄️ Database</button>
+    <button onclick="doSearch('browser automation')" style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:6px 14px;color:#8b949e;cursor:pointer;font-size:0.85em">🌐 Browser</button>
+    <button onclick="doSearch('PDF document')" style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:6px 14px;color:#8b949e;cursor:pointer;font-size:0.85em">📄 Documents</button>
+    <button onclick="doSearch('API integration')" style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:6px 14px;color:#8b949e;cursor:pointer;font-size:0.85em">🔗 APIs</button>
+    <button onclick="doSearch('cloud infrastructure')" style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:6px 14px;color:#8b949e;cursor:pointer;font-size:0.85em">☁️ Cloud</button>
+    <button onclick="doSearch('AI machine learning')" style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:6px 14px;color:#8b949e;cursor:pointer;font-size:0.85em">🤖 AI/ML</button>
+    <button onclick="doSearch('security audit')" style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:6px 14px;color:#8b949e;cursor:pointer;font-size:0.85em">🔒 Security</button>
+    <button onclick="doSearch('communication messaging')" style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:6px 14px;color:#8b949e;cursor:pointer;font-size:0.85em">💬 Comm</button>
+  </div>
+
   <div class="search-box">
     <input type="text" id="search-input" placeholder="What does your agent need? e.g. extract tables from PDF documents" onkeydown="if(event.key==='Enter')doSearch()">
     <button onclick="doSearch()">Search</button>
@@ -646,8 +658,10 @@ footer { text-align:center; padding:40px 20px; color:#484f58; font-size:0.85em; 
 </footer>
 
 <script>
-async function doSearch() {
-  const q = document.getElementById('search-input').value.trim();
+async function doSearch(preset) {
+  const inp = document.getElementById('search-input');
+  if (preset) { inp.value = preset; }
+  const q = inp.value.trim();
   const div = document.getElementById('search-results');
   if (!q) return;
   div.style.display = 'block';

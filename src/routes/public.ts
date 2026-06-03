@@ -352,8 +352,32 @@ ${[
 <div class="bar-wrap"><div class="bar-fill" style="width:${d.v}%;background:${barColor(d.v)}"></div></div></div>`).join('')}
 </div>
 
+<h2>⚡ Token Efficiency Tier</h2>
+<div class="card">
+${(() => {
+  const tokens = t.tokenCount || 200;
+  let tier: string, emoji: string, saving: string;
+  if (tokens <= 80) { tier = "Diamond"; emoji = "🥇"; saving = "95%"; }
+  else if (tokens <= 150) { tier = "Gold"; emoji = "🥈"; saving = "88%"; }
+  else if (tokens <= 250) { tier = "Silver"; emoji = "🥉"; saving = "75%"; }
+  else if (tokens <= 400) { tier = "Bronze"; emoji = "⚪"; saving = "60%"; }
+  else { tier = "Heavy"; emoji = "🔴"; saving = "40%"; }
+  const taaS = 50;
+  const savingTokens = tokens - taaS;
+  return `<div style="text-align:center;font-size:1.2em;margin:8px 0">${emoji} <strong>${tier}</strong> — ${tokens} tokens/tool</div>
+  <p class="dim" style="text-align:center">TaaS execution: ~${taaS} tokens vs manual: ~${tokens} tokens<br>Agent saves <strong>${savingTokens} tokens (${saving})</strong> per call</p>`;
+})()}
+</div>
+
 <h2>💡 Improvement Tips</h2>
 ${tips.map(t => `<div class="tip ${t.includes('Great job') ? 'good' : ''}">${t}</div>`).join('')}
+
+<h2>💰 Builder Incentive</h2>
+<div class="card" style="border-left:3px solid #ffab00">
+<p class="dim">When TaaS execution launches, every agent call to your tool earns you <strong>90% of the fee</strong>.</p>
+<p class="dim" style="margin:8px 0">Estimated: $0.001/call → <strong>$0.0009 to you</strong>. 10K calls/month = $9/month passive income.</p>
+<p class="dim">Higher grade = more agent trust = more calls = more earnings. <a href="/scoring/methodology" style="color:#7c9ff5">Improve your grade →</a></p>
+</div>
 
 <h2>🔗 Resources</h2>
 <div class="card">
@@ -715,7 +739,7 @@ async function doSearch(preset) {
       return '<div class="tool-card">' +
         '<div class="row1"><div><span style="color:#484f58;font-size:0.8em;margin-right:10px">#' + (i+1) + '</span><span class="name">' + escapeH(r.toolName) + '</span>' + disc + '</div>' +
         '<span class="badge-grade grade-' + g + '">' + (r.quality?.grade || '?') + '</span></div>' +
-        '<div class="server">' + escapeH(r.serverName) + ' · Relevance: ' + r.relevanceScore + ' · Trust: ' + r.trust?.score + '/100</div>' +
+        '<div class="server">' + escapeH(r.serverName) + ' · Relevance: ' + r.relevanceScore + ' · Trust: ' + r.trust?.score + '/100 · Token: ' + (r.efficiency?.rating || '?') + '</div>' +
         '<div class="desc">' + escapeH(r.recommendationSummary || '') + '</div>' +
         '</div>';
     }).join('');

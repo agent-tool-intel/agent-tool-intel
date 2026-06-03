@@ -581,6 +581,27 @@ footer { text-align:center; padding:40px 20px; color:#484f58; font-size:0.85em; 
   </div>
   <div id="search-results"></div>
 
+  <!-- Quality at a Glance -->
+  <h2 style="margin-top:32px;margin-bottom:12px">📊 Quality at a Glance</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:16px 0">
+    <div style="background:#161b22;border:1px solid #21262d;border-radius:8px;padding:14px;text-align:center">
+      <div style="font-size:1.4em;font-weight:800;color:#28a745">51.7%</div>
+      <div style="color:#8b949e;font-size:0.8em;margin-top:4px">Active tools (≤30d)</div>
+    </div>
+    <div style="background:#161b22;border:1px solid #21262d;border-radius:8px;padding:14px;text-align:center">
+      <div style="font-size:1.4em;font-weight:800;color:#6c75e3">89.3%</div>
+      <div style="color:#8b949e;font-size:0.8em;margin-top:4px">Grade B+ or above</div>
+    </div>
+    <div style="background:#161b22;border:1px solid #21262d;border-radius:8px;padding:14px;text-align:center">
+      <div style="font-size:1.4em;font-weight:800;color:#ffab00">2,573</div>
+      <div style="color:#8b949e;font-size:0.8em;margin-top:4px">Premium tools (≥50⭐)</div>
+    </div>
+    <div style="background:#161b22;border:1px solid #21262d;border-radius:8px;padding:14px;text-align:center">
+      <div style="font-size:1.4em;font-weight:800;color:#dc3545">0.01%</div>
+      <div style="color:#8b949e;font-size:0.8em;margin-top:4px">Truly dead projects</div>
+    </div>
+  </div>
+
   <!-- Grade Distribution -->
   <h2 style="margin-top:32px;margin-bottom:12px">Quality Grade Distribution</h2>
   <div class="grade-dist">

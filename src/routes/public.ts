@@ -555,10 +555,14 @@ footer { text-align:center; padding:40px 20px; color:#484f58; font-size:0.85em; 
 </div>
 
 <div class="stats">
-  <div class="stat"><div class="num">${totalServers}</div><div class="label">Servers Indexed</div></div>
-  <div class="stat"><div class="num">${totalTools}</div><div class="label">Tools Scored</div></div>
-  <div class="stat"><div class="num">${totalFeedback}</div><div class="label">Agent Feedback Events</div></div>
+  <div class="stat"><div class="num">${totalServers.toLocaleString()}</div><div class="label">Servers Indexed</div></div>
+  <div class="stat"><div class="num">${totalTools.toLocaleString()}</div><div class="label">Tools Scored</div></div>
+  <div class="stat"><div class="num">89.3%</div><div class="label">Grade B+ or Above</div></div>
+  <div class="stat"><div class="num">51.7%</div><div class="label">Active (≤30 days)</div></div>
 </div>
+<p style="text-align:center;color:#484f58;font-size:0.75em;margin-top:-10px;padding-bottom:12px">
+  Sources: GitHub · npm · GitLab &nbsp;|&nbsp; 10 categories &nbsp;|&nbsp; Automated ingestion &nbsp;|&nbsp; <a href="/scoring/methodology" style="color:#7c9ff5">Full methodology →</a>
+</p>
 
 <div class="container">
   <!-- Search -->

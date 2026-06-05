@@ -43,6 +43,12 @@ app.notFound((c) => {
   return c.html('<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>404 — Agent Tool Intelligence</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:#0a0a0f;color:#e0e0e0;display:flex;align-items:center;justify-content:center;height:100vh;text-align:center}.container{max-width:400px;padding:40px}h1{font-size:4em;font-weight:800;background:linear-gradient(135deg,#7c9ff5,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}p{color:#8b949e;margin:16px 0 24px}a{color:#7c9ff5;text-decoration:none;font-weight:600}a:hover{color:#a0b8ff}</style></head><body><div class="container"><h1>404</h1><p>This page does not exist. But 39,752 MCP servers do.</p><a href="/">← Back to Leaderboard</a></div></body></html>', 404);
 });
 
+// Global error handler — prevents 500 from leaking
+app.onError((err, c) => {
+  console.error("Unhandled error:", err.message);
+  return c.json({ error: "Internal server error. Please try again." }, 500);
+});
+
 // Rate limiting（simple in-memory, per-IP, 60 req/min）
 const rateLimitMap = new Map<string, { count: number; reset: number }>();
 app.use("/api/*", async (c, next) => {

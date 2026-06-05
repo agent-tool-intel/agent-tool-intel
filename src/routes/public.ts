@@ -485,8 +485,40 @@ publicRoute.get("/check", (c) => {
 
 // ── Homepage: Leaderboard ──
 
+// Simple in-memory cache for homepage stats
+let cachedStats: { servers: number; tools: number; feedback: number; grades: any[] } | null = null;
+let cacheTime = 0;
+const CACHE_TTL = 300000; // 5 minutes
+
 publicRoute.get("/", async (c) => {
-  // Get top 20 tools by quality score
+  const now = Date.now();
+
+  // Get stats（cached）
+  let totalServers: number, totalTools: number, totalFeedback: number, gradeDist: any[];
+  if (cachedStats && now - cacheTime < CACHE_TTL) {
+    totalServers = cachedStats.servers;
+    totalTools = cachedStats.tools;
+    totalFeedback = cachedStats.feedback;
+    gradeDist = cachedStats.grades;
+  } else {
+    const [serverCount, toolCount, feedbackCount] = await Promise.all([
+      db.select({ count: sql<number>`count(*)` }).from(servers),
+      db.select({ count: sql<number>`count(*)` }).from(tools),
+      db.select({ count: sql<number>`count(*)` }).from(feedback),
+    ]);
+    totalServers = Number(serverCount[0]?.count ?? 0);
+    totalTools = Number(toolCount[0]?.count ?? 0);
+    totalFeedback = Number(feedbackCount[0]?.count ?? 0);
+    gradeDist = await db
+      .select({ grade: qualityScores.grade, count: sql<number>`count(*)` })
+      .from(qualityScores)
+      .groupBy(qualityScores.grade)
+      .orderBy(qualityScores.grade);
+    cachedStats = { servers: totalServers, tools: totalTools, feedback: totalFeedback, grades: gradeDist };
+    cacheTime = now;
+  }
+
+  // Get top 20 tools by quality score（not cached — dynamic）
   const topTools = await db
     .select({
       toolName: tools.name,
@@ -502,27 +534,6 @@ publicRoute.get("/", async (c) => {
     .innerJoin(qualityScores, eq(tools.id, qualityScores.toolId))
     .orderBy(desc(qualityScores.overallScore))
     .limit(20);
-
-  // Get stats
-  const [serverCount, toolCount, feedbackCount] = await Promise.all([
-    db.select({ count: sql<number>`count(*)` }).from(servers),
-    db.select({ count: sql<number>`count(*)` }).from(tools),
-    db.select({ count: sql<number>`count(*)` }).from(feedback),
-  ]);
-
-  const totalServers = Number(serverCount[0]?.count ?? 0);
-  const totalTools = Number(toolCount[0]?.count ?? 0);
-  const totalFeedback = Number(feedbackCount[0]?.count ?? 0);
-
-  // Grade distribution
-  const gradeDist = await db
-    .select({
-      grade: qualityScores.grade,
-      count: sql<number>`count(*)`,
-    })
-    .from(qualityScores)
-    .groupBy(qualityScores.grade)
-    .orderBy(qualityScores.grade);
 
   const html = `<!DOCTYPE html>
 <html lang="en">

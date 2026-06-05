@@ -281,6 +281,13 @@ Built in the open · <a href="https://github.com/agent-tool-intel/agent-tool-int
   return c.html(html);
 });
 
+// ── Monthly Report（Public Page）──
+
+publicRoute.get("/report/monthly", async (c) => {
+  const html = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Monthly Ecosystem Report — Agent Tool Intelligence</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:#0a0a0f;color:#e0e0e0;line-height:1.6;padding:40px 20px}.container{max-width:800px;margin:0 auto}h1{font-size:1.8em;background:linear-gradient(135deg,#7c9ff5,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}h2{font-size:1.2em;margin:32px 0 12px;color:#e0e0e0;border-bottom:1px solid #21262d;padding-bottom:8px}table{width:100%;border-collapse:collapse;margin:12px 0 20px}th,td{padding:10px 14px;text-align:left;border-bottom:1px solid #21262d}th{color:#c0c0c0}td{font-size:0.9em}.back{color:#7c9ff5;text-decoration:none;font-size:0.9em}.loading{color:#8b949e;text-align:center;padding:60px}</style></head><body><div class="container"><a href="/" class="back">← Back</a><h1>Monthly Ecosystem Report</h1><div id="report" class="loading">Loading report...</div></div><script>fetch("/api/v1/report/monthly?format=md").then(r=>r.text()).then(md=>{document.getElementById("report").innerHTML="<pre style=\'background:#161b22;border:1px solid #30363d;border-radius:8px;padding:24px;white-space:pre-wrap;font-family:monospace;font-size:0.9em;line-height:1.6;color:#e0e0e0\'>"+md.replace(/</g,"&lt;").replace(/>/g,"&gt;")+"</pre>"}).catch(()=>{document.getElementById("report").innerHTML="<p style=\'color:#8b949e\'>Report generation in progress. Check back soon.</p>"})</script></body></html>';
+  return c.html(html);
+});
+
 // ── Tool Health Dashboard ──
 
 publicRoute.get("/health/:owner/:repo", async (c) => {

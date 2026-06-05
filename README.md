@@ -1,107 +1,132 @@
 # Agent Tool Intelligence
 
-> **Tools on tap. Not on disk.**
+> **The quality standard for AI agent tools.**
 >
-> The quality standard for AI agent tools. Semantic search, automated quality scoring, trust engine, and agent-native signals — built for agents, transparent for humans.
+> 39,752+ MCP servers scored. Semantic search. Trust engine. Execution analytics.
+> Built for AI agents. Transparent for builders. Open source.
 
-[![Grade: A](https://agent-tool-intel-production.up.railway.app/badge/puppeteer%2Fpuppeteer)](https://agent-tool-intel-production.up.railway.app)
+<p align="center">
+  <a href="https://agent-tool-intel-production.up.railway.app">
+    <img src="https://agent-tool-intel-production.up.railway.app/badge/puppeteer%2Fpuppeteer" alt="Grade A" />
+  </a>
+  <br/>
+  <sub>Every MCP server deserves a grade. <a href="https://agent-tool-intel-production.up.railway.app">Check yours →</a></sub>
+</p>
 
 ---
 
-## Why?
+## 🗺️ You just found treasure. Now what?
 
-AI agents need tools. But today:
-- **73% of MCP servers are invisible to agents** (no discoverable tool definitions)
-- **Top 4 most popular servers all score D or below** in quality audits
-- **36% of MCP servers score F on security**
-- **No registry supports agent-driven discovery** — all browsing is human-mediated
+| You are a... | Start here |
+|-------------|------------|
+| 🛠️ **MCP Builder** | → [Check your server's grade instantly](https://agent-tool-intel-production.up.railway.app) — paste your GitHub URL |
+| 🤖 **AI Developer** | → [API Quick Start](#-quick-start) — one curl to search 39K+ tools |
+| 🔍 **Just curious** | → [See the public leaderboard](https://agent-tool-intel-production.up.railway.app) — top tools ranked |
+| 🏢 **Enterprise / Team** | → [Scoring Methodology](https://agent-tool-intel-production.up.railway.app/scoring/methodology) — how we score, transparently |
+| 🤝 **Want to partner?** | → [Open an issue](https://github.com/agent-tool-intel/agent-tool-intel/issues) or contact us |
 
-Agent Tool Intelligence fixes this.
+---
 
-## What?
+## 💎 The Treasure: What's Inside
 
-A **Tool-as-a-Service (TaaS)** platform that lets AI agents discover, evaluate, and select tools autonomously.
+### For MCP Builders
+
+| Treasure | What you get |
+|----------|-------------|
+| 🏷️ **[Grade Badge](https://agent-tool-intel-production.up.railway.app)** | Dynamic SVG badge for your README. Auto-updates. Free forever. |
+| 📊 **[Health Dashboard](https://agent-tool-intel-production.up.railway.app)** | Per-repo score breakdown. See exactly what to improve. |
+| 💡 **Improvement Tips** | Specific, actionable advice to raise your grade. |
+| 📈 **Monthly Ecosystem Report** | Where your tool ranks. Trends. Hidden gems. |
+| ⚡ **Execution Analytics** *(coming)* | How many agents use your tool? Success rate? |
+
+### For AI Agents
+
+| Treasure | What you get |
+|----------|-------------|
+| 🔍 **Semantic Search API** | "Extract tables from PDF" → ranked results. Not keyword match. |
+| 🧠 **Agent Readiness Score** | 6 signals agents actually care about. |
+| 🛡️ **Trust Engine** | Real-world success rates. Not simulated. |
+| 🚀 **Execution Gateway** *(coming)* | Execute tools via one API call. |
+
+### For Everyone
+
+| Treasure | What you get |
+|----------|-------------|
+| 📖 **Open Source** | MIT license. All scoring methodology public. |
+| 🔬 **Transparent Scores** | 13 signal dimensions. No black box. |
+| 📊 **Ecosystem Data** | 39,752 servers. Grade distribution. Trends. |
+
+---
+
+## 🗺️ Dig Deeper: The Full Map
 
 ```
-Agent: "I need to extract tables from PDFs"
-   ↓
-POST /api/v1/search  →  5 ranked results
-   ↓
-Best pick: puppeteer/puppeteer (A-grade, 94K⭐, 94% trust)
-   ↓
-Agent calls tool. Gets result. Done.
+🥇 Level 1:  Self-check your tool         → https://agent-tool-intel-production.up.railway.app
+🥈 Level 2:  Read the API docs            → https://agent-tool-intel-production.up.railway.app/docs
+🥉 Level 3:  Understand the methodology   → https://agent-tool-intel-production.up.railway.app/scoring/methodology
+🏆 Level 4:  See the roadmap              → https://agent-tool-intel-production.up.railway.app/roadmap
+👑 Level 5:  Become a partner             → Open an issue or email us
 ```
 
-## Features
+---
 
-- **Semantic Search** — Agents search by capability, not keyword ("extract tables from PDF" → ranked results)
-- **Agent Readiness Score** — Official status, GitHub stars, activity, documentation quality
-- **Trust Engine** — Real-world success rates from agent feedback
-- **Community Score** — Human-generated signals (stars, downloads, recency)
-- **Discrepancy Flag** — Detects quality-trust contradictions (well-designed but unverified)
-- **Sandbox Validation** — 7 automated checks per tool
-- **Grade Badge** — Embed your tool's grade on GitHub README
-
-## Quick Start
+## 🚀 Quick Start
 
 ```bash
-# Search for tools
+# Search for tools (agents call this)
 curl -X POST https://agent-tool-intel-production.up.railway.app/api/v1/search \
   -H "Content-Type: application/json" \
-  -d '{"query": "browser automation", "maxResults": 3}'
+  -d '{"query": "extract tables from PDF", "maxResults": 3}'
 
-# Get tool details
-curl https://agent-tool-intel-production.up.railway.app/api/v1/tools/{tool_id}
-
-# Submit feedback
-curl -X POST https://agent-tool-intel-production.up.railway.app/api/v1/feedback \
-  -H "Content-Type: application/json" \
-  -d '{"toolId": "tool:mcp:puppeteer/puppeteer@latest", "result": "success", "rating": 5}'
+# Embed a grade badge (builders do this)
+# [![Grade](https://agent-tool-intel-production.up.railway.app/badge/YOUR_ORG%2FYOUR_REPO)]
+# (https://agent-tool-intel-production.up.railway.app)
 ```
 
-## Grade Badge
+---
 
-Add your MCP server's quality grade to your GitHub README:
+## 📊 By The Numbers
 
-```markdown
-[![Agent Tool Intel](https://agent-tool-intel-production.up.railway.app/badge/YOUR_ORG%2FYOUR_REPO)](https://agent-tool-intel-production.up.railway.app)
-```
+| Stat | Value |
+|------|-------|
+| MCP Servers Indexed | **39,752** |
+| Tools Scored | **39,762** |
+| Grade A (truly exceptional) | **~4%** |
+| Sources | GitHub, npm, GitLab, Official Registry |
+| Open Source | MIT License |
 
-Replace `YOUR_ORG%2FYOUR_REPO` with your server name (use `%2F` for `/`).
+---
 
-Badge auto-updates as scores change. [See live example →](https://agent-tool-intel-production.up.railway.app)
+## 🏗️ Architecture
 
-## Platform
+This is part of the **Agent Tool Platform**:
 
-This project is part of the **Agent Tool Platform**:
-
-| Module | Role |
-|--------|------|
-| **Agent Tool Intel** ← you are here | Quality scoring + search + trust |
-| [AutoMine](https://github.com/agent-tool-intel/AI_Agent_Daily_Digest) | Tool discovery from content |
-| [AgentPilot](https://github.com/agent-tool-intel/agent-pilot) | Tool registry + execution |
+| Module | What it does | Status |
+|--------|-------------|:---:|
+| **Agent Tool Intel** ← you are here | Quality scoring + search + trust | ✅ Live |
+| [AgentPilot](https://github.com/agent-tool-intel/agent-pilot) | Agent task orchestration + tool registry | ✅ Live |
+| AutoMine | Automated tool discovery from content | 🔧 |
 
 All three share a unified **Canonical ID** system: `tool:{source}:{namespace}/{name}@version`
 
-## Stats
+---
 
-- **1,824** MCP servers indexed
-- **1,834** tools scored
-- **9,244** agent feedback events
-- Sources: GitHub (1,705), npm (120)
+## 🤝 How to Contribute
 
-## API
+- **MCP Builder?** [Check your grade](https://agent-tool-intel-production.up.railway.app) and embed a badge
+- **Found a bug?** [Open an issue](https://github.com/agent-tool-intel/agent-tool-intel/issues)
+- **Want to improve scoring?** Read [CONTRIBUTING.md](CONTRIBUTING.md)
+- **Have real execution data?** [Become a partner](https://github.com/agent-tool-intel/agent-tool-intel/issues) — data feeds improve trust scores for everyone
+- **Just want to say hi?** We read every issue
 
-Base URL: `https://agent-tool-intel-production.up.railway.app`
+---
 
-| Endpoint | Description |
-|----------|-------------|
-| `POST /api/v1/search` | Semantic tool search with agent signals |
-| `GET /api/v1/tools/:id` | Tool detail with scores |
-| `POST /api/v1/tools/:id/test` | Sandbox validation |
-| `POST /api/v1/feedback` | Submit agent usage feedback |
-| `GET /health` | Health check |
+## 📜 License
 
-## License
+MIT — use it, fork it, build on it. Just don't spam people with it.
 
-MIT
+---
+
+<p align="center">
+  <sub>Built in the open. One civil engineer + one AI agent. 10 days.</sub>
+</p>

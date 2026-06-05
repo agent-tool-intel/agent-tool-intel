@@ -570,6 +570,7 @@ a:hover { color: #a0b8ff; }
 .search-box button:hover { background:#8aa8ff; }
 #search-results { background:#161b22; border:1px solid #30363d; border-radius:8px; display:none; padding:20px; }
 #search-results.loading { display:block; text-align:center; padding:40px; color:#8b949e; }
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* Leaderboard */
 .leaderboard { margin-top:8px; }
@@ -789,7 +790,7 @@ async function doSearch(preset) {
   if (!q) return;
   div.style.display = 'block';
   div.className = 'loading';
-  div.innerHTML = '<p>Searching ${totalTools} tools...</p>';
+  div.innerHTML = '<div style="text-align:center;padding:40px"><div style="display:inline-block;width:32px;height:32px;border:3px solid #30363d;border-top-color:#7c9ff5;border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:16px"></div><p style="color:#8b949e">Searching ${totalTools.toLocaleString()} tools...</p></div>';
 
   try {
     const resp = await fetch('/api/v1/search', {
@@ -894,6 +895,35 @@ publicRoute.get("/badge/:toolId", async (c) => {
     "Content-Type": "image/svg+xml",
     "Cache-Control": "public, max-age=3600",
   });
+});
+
+// ── Favicon（inline SVG）──
+publicRoute.get("/favicon.ico", (c) => {
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="#0d1117"/><text x="16" y="23" font-family="system-ui,sans-serif" font-size="20" font-weight="800" fill="#7c9ff5" text-anchor="middle">A</text></svg>';
+  return c.html(svg, 200, { "Content-Type": "image/svg+xml", "Cache-Control": "public, max-age=86400" });
+});
+
+// ── robots.txt ──
+publicRoute.get("/robots.txt", (c) => {
+  return c.text(`User-agent: *
+Allow: /
+Allow: /docs
+Allow: /scoring/methodology
+Allow: /roadmap
+Allow: /report/monthly
+Allow: /partners
+Sitemap: https://agent-tool-intel-production.up.railway.app/sitemap.xml
+`, 200, { "Content-Type": "text/plain" });
+});
+
+// ── sitemap.xml ──
+publicRoute.get("/sitemap.xml", (c) => {
+  const pages = ["", "docs", "scoring/methodology", "roadmap", "report/monthly", "partners"];
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${pages.map(p => `  <url><loc>https://agent-tool-intel-production.up.railway.app/${p}</loc><changefreq>weekly</changefreq></url>`).join("\n")}
+</urlset>`;
+  return c.html(xml, 200, { "Content-Type": "application/xml" });
 });
 
 function escapeHtml(s: string): string {

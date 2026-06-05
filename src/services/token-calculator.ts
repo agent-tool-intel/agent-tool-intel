@@ -1,5 +1,5 @@
 // Token Calculator — Phase 3A Feature #4, #20
-// Calculates token savings: TaaS (platform execute) vs DIY (agent self-serve)
+// Calculates token savings: platform-optimized vs DIY
 
 interface TokenEstimate {
   search: number;      // tokens to find the tool
@@ -59,7 +59,7 @@ function estimateDiyTokens(successRate: number): TokenEstimate {
 }
 
 function estimateTaasTokens(): TokenEstimate {
-  // TaaS: POST /search → POST /execute → result
+  // Platform: POST /search → POST /execute → result
   return {
     search: 15,        // API call: query embedding
     understand: 0,     // Platform handles this
@@ -73,7 +73,7 @@ export function renderTokenSavingsMd(comparison: TokenComparison, monthlyExecuti
 
   return `## ⚡ Token Efficiency
 
-| Metric | Agent DIY | TaaS (via Intel) |
+| Metric | Agent DIY | Platform |
 |--------|:---:|:---:|
 | Search | ${diy.search} tokens | ${taas.search} tokens |
 | Understand tool | ${diy.understand} tokens | ${taas.understand} tokens |

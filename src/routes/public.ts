@@ -229,29 +229,53 @@ li { color:#8b949e; padding:4px 0; font-size:0.9em; }
 <h1>Roadmap</h1>
 <p style="color:#8b949e;margin-bottom:24px">What we've built. More coming.</p>
 
-<div class="phase"><h2 class="done">✅ Phase 1 — Foundation</h2><ul>
-<li><span class="check">✓</span>Semantic search across MCP ecosystem</li>
-<li><span class="check">✓</span>Automated quality scoring (5 dimensions)</li>
-<li><span class="check">✓</span>Trust engine with feedback loop</li>
-<li><span class="check">✓</span>Grade badges for GitHub README</li>
-<li><span class="check">✓</span>Public API + documentation</li>
-<li><span class="check">✓</span>19,000+ MCP servers indexed</li>
-<li><span class="check">✓</span>6 distribution channels</li>
-</ul></div>
-
-<div class="phase"><h2 class="done">✅ Phase 2A — Build Trust</h2><ul>
-<li><span class="check">✓</span>Scoring calibration</li>
-<li><span class="check">✓</span>Trust Tier System</li>
-<li><span class="check">✓</span>Data Provenance</li>
+<div class="phase"><h2 class="done">✅ Phase A — Build Trust</h2><ul>
+<li><span class="check">✓</span>Scoring calibration (81% A → meaningful B/C spread)</li>
+<li><span class="check">✓</span>Trust Tier System (6 tiers)</li>
+<li><span class="check">✓</span>Data Provenance labels</li>
 <li><span class="check">✓</span>Verified Publisher Badge</li>
-<li><span class="check">✓</span>Activity Transparency</li>
 <li><span class="check">✓</span>Self-Check Tool</li>
 <li><span class="check">✓</span>Tool Health Dashboard</li>
-<li><span class="check">✓</span>Featured Weekly picks</li>
-<li><span class="check">✓</span>Methodology page</li>
+<li><span class="check">✓</span>Scoring Methodology page</li>
+<li><span class="check">✓</span>Outreach Guard (zero spam)</li>
 </ul></div>
 
-<p class="footnote">More phases coming. We ship, then we talk.<br>
+<div class="phase"><h2 class="done">✅ Phase B — Spread</h2><ul>
+<li><span class="check">✓</span>GitHub Action (auto-grade on push)</li>
+<li><span class="check">✓</span>Grade Badge (dynamic SVG)</li>
+<li><span class="check">✓</span>VS Code Extension</li>
+<li><span class="check">✓</span>npm Badge support</li>
+<li><span class="check">✓</span>39,752+ MCP servers indexed</li>
+<li><span class="check">✓</span>Continuous data ingestion</li>
+</ul></div>
+
+<div class="phase"><h2 class="done">✅ Phase 1 — MVP</h2><ul>
+<li><span class="check">✓</span>Semantic search API</li>
+<li><span class="check">✓</span>Quality scoring (5 dimensions)</li>
+<li><span class="check">✓</span>Trust engine with feedback loop</li>
+<li><span class="check">✓</span>Sandbox validation (7 checks)</li>
+<li><span class="check">✓</span>Discrepancy Flag</li>
+<li><span class="check">✓</span>AgentPilot + AutoMine integration</li>
+</ul></div>
+
+<div class="phase"><h2 class="done">✅ Phase 2 — Public Page + Scale</h2><ul>
+<li><span class="check">✓</span>Public leaderboard + search</li>
+<li><span class="check">✓</span>API documentation</li>
+<li><span class="check">✓</span>Agent Signals (stars, activity, official, docs)</li>
+<li><span class="check">✓</span>Community Score</li>
+<li><span class="check">✓</span>39,752 servers · 39,762 tools</li>
+<li><span class="check">✓</span>90%+ hit rate</li>
+</ul></div>
+
+<div class="phase"><h2>🔧 Phase 3 — Analytics & Signals</h2><ul>
+<li>Execution analytics for builders</li>
+<li>Real usage data for trust scores</li>
+<li>Improvement tips engine</li>
+<li>Monthly ecosystem report</li>
+<li>Tool claiming + builder dashboard</li>
+</ul></div>
+
+<p class="footnote">We ship, then we talk. What's next depends on what builders need.<br>
 Built in the open · <a href="https://github.com/agent-tool-intel/agent-tool-intel" style="color:#7c9ff5">GitHub</a></p>
 </div></body></html>`;
   return c.html(html);
@@ -365,7 +389,7 @@ ${(() => {
   const taaS = 50;
   const savingTokens = tokens - taaS;
   return `<div style="text-align:center;font-size:1.2em;margin:8px 0">${emoji} <strong>${tier}</strong> — ${tokens} tokens/tool</div>
-  <p class="dim" style="text-align:center">TaaS execution: ~${taaS} tokens vs manual: ~${tokens} tokens<br>Agent saves <strong>${savingTokens} tokens (${saving})</strong> per call</p>`;
+  <p class="dim" style="text-align:center">Platform-optimized: ~${taaS} tokens vs manual: ~${tokens} tokens<br>Agent saves <strong>${savingTokens} tokens (${saving})</strong> per call</p>`;
 })()}
 </div>
 
@@ -374,7 +398,7 @@ ${tips.map(t => `<div class="tip ${t.includes('Great job') ? 'good' : ''}">${t}<
 
 <h2>💰 Builder Incentive</h2>
 <div class="card" style="border-left:3px solid #ffab00">
-<p class="dim">When TaaS execution launches, every agent call to your tool earns you <strong>90% of the fee</strong>.</p>
+<p class="dim">Real execution data feeds back into your quality and trust scores — creating a virtuous cycle of improvement and discovery.</p>
 <p class="dim" style="margin:8px 0">Estimated: $0.001/call → <strong>$0.0009 to you</strong>. 10K calls/month = $9/month passive income.</p>
 <p class="dim">Higher grade = more agent trust = more calls = more earnings. <a href="/scoring/methodology" style="color:#7c9ff5">Improve your grade →</a></p>
 </div>
@@ -500,7 +524,7 @@ publicRoute.get("/", async (c) => {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Agent Tool Intelligence — Quality Scores for AI Agent Tools</title>
 <meta name="description" content="AI agent discovers, evaluates, and selects MCP tools autonomously. 39,752+ servers scored. Quality scoring, trust engine, agent-ready signals. Built for AI agents, transparent for builders.">
-<meta name="keywords" content="MCP, Model Context Protocol, AI agent tools, tool quality scoring, MCP server, agent tool discovery, MCP marketplace, TaaS, Tool as a Service">
+<meta name="keywords" content="MCP, Model Context Protocol, AI agent tools, tool quality scoring, MCP server, agent tool discovery, quality scoring platform, open source">
 <meta property="og:title" content="Agent Tool Intelligence — Quality Scores for MCP Tools">
 <meta property="og:description" content="39,752+ MCP servers scored. Quality, trust, and execution analytics for AI agent tools. Built for agents, transparent for builders.">
 <meta property="og:type" content="website">

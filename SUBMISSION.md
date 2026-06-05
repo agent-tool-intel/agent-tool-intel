@@ -40,7 +40,7 @@ Short Description:
 The quality standard for MCP tools. 10,000+ servers indexed. Search, score, trust.
 
 Full Description:
-Agent Tool Intelligence is a Tool-as-a-Service (TaaS) platform that lets AI agents discover, evaluate, and select MCP tools autonomously. Features: semantic search, automated quality scoring (5 dimensions), trust engine (real-world success rates), agent-native signals (stars, activity, official status), community score, discrepancy detection, sandbox validation, and dynamic grade badges for builders.
+Agent Tool Intelligence is a platform that lets AI agents discover, evaluate, and select MCP tools autonomously. Features: semantic search, automated quality scoring (5 dimensions), trust engine (real-world success rates), agent-native signals (stars, activity, official status), community score, discrepancy detection, sandbox validation, and dynamic grade badges for builders.
 
 Website:
 https://agent-tool-intel-production.up.railway.app

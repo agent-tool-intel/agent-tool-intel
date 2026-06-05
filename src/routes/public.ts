@@ -639,7 +639,7 @@ footer { text-align:center; padding:40px 20px; color:#484f58; font-size:0.85em; 
       <div style="color:#8b949e;font-size:0.88em">Agents: find the best tool for any task. Semantic search across 39K+ servers.</div>
     </div>
 
-    <a href="/health/puppeteer/puppeteer" style="text-decoration:none;color:inherit">
+    <a href="#self-check" style="text-decoration:none;color:inherit">
       <div style="background:#161b22;border:1px solid #21262d;border-radius:8px;padding:20px;cursor:pointer;transition:border-color 0.15s" onmouseover="this.style.borderColor='#28a745'" onmouseout="this.style.borderColor='#21262d'">
         <div style="font-size:1.4em;margin-bottom:8px">🏆</div>
         <div style="font-weight:700;margin-bottom:4px;color:#e0e0e0">Check your grade</div>
@@ -749,7 +749,7 @@ footer { text-align:center; padding:40px 20px; color:#484f58; font-size:0.85em; 
   </div>
 
   <!-- Self-Check Tool -->
-  <div class="badge-section" style="margin-bottom:24px">
+  <div id="self-check" class="badge-section" style="margin-bottom:24px">
     <h3>🔍 Check Your Tool's Grade</h3>
     <p style="color:#8b949e;margin-bottom:12px">Paste your GitHub repo to get a <strong>full health dashboard</strong> — score breakdown, improvement tips, badge embed code, and Trust Tier.</p>
     <form action="/check" method="get" style="display:flex;gap:10px;flex-wrap:wrap">

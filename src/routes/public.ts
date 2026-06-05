@@ -771,6 +771,7 @@ footer { text-align:center; padding:40px 20px; color:#484f58; font-size:0.85em; 
     </div>
     <code>&lt;a href="https://agent-tool-intel-production.up.railway.app"&gt;&lt;img src="https://agent-tool-intel-production.up.railway.app/badge/YOUR_ORG%2FYOUR_REPO" alt="Agent Tool Intel Grade" /&gt;&lt;/a&gt;</code>
     <p style="color:#8b949e;margin-top:10px;font-size:0.85em">Replace <code>YOUR_ORG%2FYOUR_REPO</code> with your server name. <code>/</code> → <code>%2F</code>. Badge auto-updates. Also works on <strong>npm</strong>, <strong>PyPI</strong>, and any Markdown page.</p>
+    <p style="color:#8b949e;margin-top:6px;font-size:0.8em">🔥 <strong>New: Badge v2 with execution count</strong> — shows how many times agents have run your tool. Use <code>/badge/v2/YOUR_ORG%2FYOUR_REPO</code> instead.</p>
   </div>
 </div>
 

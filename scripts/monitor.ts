@@ -9,7 +9,7 @@ import { sql } from "drizzle-orm";
 const TOKEN = process.env.GITHUB_TOKEN;
 if (!TOKEN) { console.error("GITHUB_TOKEN not set"); process.exit(1); }
 const INTEL_URL = "https://agent-tool-intel-production.up.railway.app";
-const CHECK_OWNER = "HMCHENGGH"; // Your GitHub handle — issues you created
+const CHECK_OWNER = "agent-tool-intel"; // Your GitHub handle — issues you created
 
 // All outreach issues we created
 const OUTREACH_ISSUES = [

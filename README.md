@@ -78,8 +78,8 @@ This project is part of the **Agent Tool Platform**:
 | Module | Role |
 |--------|------|
 | **Agent Tool Intel** ← you are here | Quality scoring + search + trust |
-| [AutoMine](https://github.com/HMCHENGGH/AI_Agent_Daily_Digest) | Tool discovery from content |
-| [AgentPilot](https://github.com/HMCHENGGH/agent-pilot) | Tool registry + execution |
+| [AutoMine](https://github.com/agent-tool-intel/AI_Agent_Daily_Digest) | Tool discovery from content |
+| [AgentPilot](https://github.com/agent-tool-intel/agent-pilot) | Tool registry + execution |
 
 All three share a unified **Canonical ID** system: `tool:{source}:{namespace}/{name}@version`
 

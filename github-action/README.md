@@ -19,7 +19,7 @@ jobs:
   grade:
     runs-on: ubuntu-latest
     steps:
-      - uses: HMCHENGGH/agent-tool-intel/github-action@master
+      - uses: agent-tool-intel/agent-tool-intel/github-action@master
 ```
 
 That's it. On every push, your workflow summary will show your current grade.

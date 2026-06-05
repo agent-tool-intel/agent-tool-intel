@@ -194,7 +194,7 @@ ${gradeDist.map(g => {
 <h2>5. Continuous Improvement</h2>
 <p>Scores are recalculated periodically. Improving your tool's schemas, descriptions, or install documentation directly improves your Quality Score. Real-world agent usage improves your Trust Score. We're actively calibrating based on ecosystem feedback.</p>
 
-<p style="color:#8b949e;font-size:0.85em;margin-top:30px;">Last updated: ${new Date().toISOString().slice(0, 10)}</p><footer style="text-align:center;padding:20px;color:#484f58;font-size:0.85em;border-top:1px solid #21262d;margin-top:20px"><a href="/" style="color:#7c9ff5">Home</a> · <a href="/docs" style="color:#7c9ff5">API Docs</a> · <a href="/scoring/methodology" style="color:#7c9ff5">Methodology</a> · <a href="/roadmap" style="color:#7c9ff5">Roadmap</a> · <a href="/partners" style="color:#7c9ff5">Partners</a> · <a href="https://github.com/HMCHENGGH/agent-tool-intel" style="color:#7c9ff5">GitHub</a></footer>
+<p style="color:#8b949e;font-size:0.85em;margin-top:30px;">Last updated: ${new Date().toISOString().slice(0, 10)}</p><footer style="text-align:center;padding:20px;color:#484f58;font-size:0.85em;border-top:1px solid #21262d;margin-top:20px"><a href="/" style="color:#7c9ff5">Home</a> · <a href="/docs" style="color:#7c9ff5">API Docs</a> · <a href="/scoring/methodology" style="color:#7c9ff5">Methodology</a> · <a href="/roadmap" style="color:#7c9ff5">Roadmap</a> · <a href="/partners" style="color:#7c9ff5">Partners</a> · <a href="https://github.com/agent-tool-intel/agent-tool-intel" style="color:#7c9ff5">GitHub</a></footer>
 </div>
 </body>
 </html>`;
@@ -252,7 +252,7 @@ li { color:#8b949e; padding:4px 0; font-size:0.9em; }
 </ul></div>
 
 <p class="footnote">More phases coming. We ship, then we talk.<br>
-Built in the open · <a href="https://github.com/HMCHENGGH/agent-tool-intel" style="color:#7c9ff5">GitHub</a></p>
+Built in the open · <a href="https://github.com/agent-tool-intel/agent-tool-intel" style="color:#7c9ff5">GitHub</a></p>
 </div></body></html>`;
   return c.html(html);
 });
@@ -385,7 +385,7 @@ ${tips.map(t => `<div class="tip ${t.includes('Great job') ? 'good' : ''}">${t}<
 <code style="background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:8px 12px;display:block;margin:8px 0;font-size:0.85em;color:#7c9ff5;overflow-x:auto">
 [![Grade ${grade}](https://agent-tool-intel-production.up.railway.app/badge/${encodeURIComponent(fullName)})](https://agent-tool-intel-production.up.railway.app)
 </code>
-<footer style="text-align:center;padding:20px;color:#484f58;font-size:0.85em;border-top:1px solid #21262d;margin-top:20px"><a href="/" style="color:#7c9ff5">Home</a> · <a href="/docs" style="color:#7c9ff5">API Docs</a> · <a href="/scoring/methodology" style="color:#7c9ff5">Methodology</a> · <a href="/roadmap" style="color:#7c9ff5">Roadmap</a> · <a href="/partners" style="color:#7c9ff5">Partners</a> · <a href="https://github.com/HMCHENGGH/agent-tool-intel" style="color:#7c9ff5">GitHub</a></footer>
+<footer style="text-align:center;padding:20px;color:#484f58;font-size:0.85em;border-top:1px solid #21262d;margin-top:20px"><a href="/" style="color:#7c9ff5">Home</a> · <a href="/docs" style="color:#7c9ff5">API Docs</a> · <a href="/scoring/methodology" style="color:#7c9ff5">Methodology</a> · <a href="/roadmap" style="color:#7c9ff5">Roadmap</a> · <a href="/partners" style="color:#7c9ff5">Partners</a> · <a href="https://github.com/agent-tool-intel/agent-tool-intel" style="color:#7c9ff5">GitHub</a></footer>
 </div>
 </div></body></html>`;
   return c.html(html);
@@ -438,7 +438,7 @@ code { background:#0d1117; border:1px solid #30363d; border-radius:4px; padding:
 <p style="margin-top:8px"><a href="https://agent-tool-intel-production.up.railway.app/health/Aigen-Protocol/aigen-protocol" style="color:#7c9ff5">View Health Dashboard →</a></p>
 </div>
 
-<p style="color:#8b949e;font-size:0.85em;margin-top:30px">Interested in becoming a partner? <a href="https://github.com/HMCHENGGH/agent-tool-intel" style="color:#7c9ff5">Open an issue</a> or contact us.</p>
+<p style="color:#8b949e;font-size:0.85em;margin-top:30px">Interested in becoming a partner? <a href="https://github.com/agent-tool-intel/agent-tool-intel" style="color:#7c9ff5">Open an issue</a> or contact us.</p>
 </div>
 </body></html>`;
   return c.html(html);
@@ -499,7 +499,17 @@ publicRoute.get("/", async (c) => {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Agent Tool Intelligence — Quality Scores for AI Agent Tools</title>
-<meta name="description" content="AI agent discovers, evaluates, and selects tools autonomously. Quality scoring, trust engine, sandbox testing for MCP servers.">
+<meta name="description" content="AI agent discovers, evaluates, and selects MCP tools autonomously. 39,752+ servers scored. Quality scoring, trust engine, agent-ready signals. Built for AI agents, transparent for builders.">
+<meta name="keywords" content="MCP, Model Context Protocol, AI agent tools, tool quality scoring, MCP server, agent tool discovery, MCP marketplace, TaaS, Tool as a Service">
+<meta property="og:title" content="Agent Tool Intelligence — Quality Scores for MCP Tools">
+<meta property="og:description" content="39,752+ MCP servers scored. Quality, trust, and execution analytics for AI agent tools. Built for agents, transparent for builders.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://agent-tool-intel-production.up.railway.app">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Agent Tool Intelligence — MCP Tool Quality Scores">
+<meta name="twitter:description" content="39,752+ MCP servers scored. The quality layer for AI agent tools.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://agent-tool-intel-production.up.railway.app">
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #0a0a0f; color: #e0e0e0; line-height:1.6; }
@@ -702,7 +712,7 @@ footer { text-align:center; padding:40px 20px; color:#484f58; font-size:0.85em; 
 </div>
 
 <footer>
-  <a href="/">Home</a> · <a href="/docs">API Docs</a> · <a href="/scoring/methodology">Methodology</a> · <a href="/roadmap">Roadmap</a> · <a href="https://github.com/HMCHENGGH/agent-tool-intel">GitHub</a>
+  <a href="/">Home</a> · <a href="/docs">API Docs</a> · <a href="/scoring/methodology">Methodology</a> · <a href="/roadmap">Roadmap</a> · <a href="https://github.com/agent-tool-intel/agent-tool-intel">GitHub</a>
   <br><br>Agent Tool Intelligence v0.1.0 · Built for agents. Transparent for humans.
 </footer>
 

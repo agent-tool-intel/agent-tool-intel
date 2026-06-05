@@ -5,7 +5,7 @@
 ```
 Name:        Agent Tool Intelligence
 URL:         https://agent-tool-intel-production.up.railway.app
-GitHub:      https://github.com/HMCHENGGH/agent-tool-intel
+GitHub:      https://github.com/agent-tool-intel/agent-tool-intel
 Category:    Developer Tools / AI Agent Tools
 Tags:        mcp, agent-tools, quality-scoring, trust-engine, tool-discovery, semantic-search
 ```
@@ -24,7 +24,7 @@ Homepage:
 https://agent-tool-intel-production.up.railway.app
 
 GitHub:
-https://github.com/HMCHENGGH/agent-tool-intel
+https://github.com/agent-tool-intel/agent-tool-intel
 
 Tags:
 mcp, agent-tools, quality, trust, search, discovery
@@ -46,7 +46,7 @@ Website:
 https://agent-tool-intel-production.up.railway.app
 
 GitHub:
-https://github.com/HMCHENGGH/agent-tool-intel
+https://github.com/agent-tool-intel/agent-tool-intel
 
 ---
 
@@ -59,7 +59,7 @@ Description:
 10,000+ MCP servers indexed with automated quality scoring, trust engine, and agent-native signals. API-first. Built for agents, transparent for builders. Includes: semantic search, 5-dimension quality scoring, community score, grade badges, sandbox validation, and a public leaderboard.
 
 Website: https://agent-tool-intel-production.up.railway.app
-GitHub: https://github.com/HMCHENGGH/agent-tool-intel
+GitHub: https://github.com/agent-tool-intel/agent-tool-intel
 API Docs: https://agent-tool-intel-production.up.railway.app/docs
 
 ---
@@ -73,7 +73,7 @@ Body:
 
 - **Description**: Quality scores for 10,000+ MCP servers. Semantic search, trust engine, agent-native signals, grade badges.
 - **Website**: https://agent-tool-intel-production.up.railway.app
-- **GitHub**: https://github.com/HMCHENGGH/agent-tool-intel
+- **GitHub**: https://github.com/agent-tool-intel/agent-tool-intel
 - **Category**: Tool Discovery & Quality
 - **Key Features**:
   - Semantic search across 10,000+ MCP servers

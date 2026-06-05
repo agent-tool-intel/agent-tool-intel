@@ -55,7 +55,7 @@ li { color:#8b949e; padding:4px 0; font-size:0.9em; }
 </ul></div>
 
 <p class="footnote">More phases coming. We ship, then we talk.<br>
-Built in the open · <a href="https://github.com/HMCHENGGH/agent-tool-intel" style="color:#7c9ff5">GitHub</a></p>
+Built in the open · <a href="https://github.com/agent-tool-intel/agent-tool-intel" style="color:#7c9ff5">GitHub</a></p>
 </div></body></html>\`;
   return c.html(html);
 });

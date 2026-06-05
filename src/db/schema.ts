@@ -114,3 +114,97 @@ export const searchLogs = pgTable("search_logs", {
   topToolIds: uuid("top_tool_ids").array(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
+
+// ── 8. Execution Events（Phase 3A）──
+
+export const executionEvents = pgTable("execution_events", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  toolId: uuid("tool_id")
+    .references(() => tools.id, { onDelete: "cascade" })
+    .notNull(),
+  success: boolean("success").notNull(),
+  latencyMs: integer("latency_ms").notNull(),
+  tokensConsumed: integer("tokens_consumed"),
+  errorMessage: text("error_message"),
+  agentId: text("agent_id"),
+  partnerSource: text("partner_source"), // "aigen" | "agentpilot" | "self"
+  executedAt: timestamp("executed_at", { withTimezone: true }).defaultNow(),
+});
+
+// ── 9. Execution Stats（daily rollup, Phase 3A）──
+
+export const executionStats = pgTable("execution_stats", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  toolId: uuid("tool_id")
+    .references(() => tools.id, { onDelete: "cascade" })
+    .notNull(),
+  date: text("date").notNull(), // YYYY-MM-DD
+  totalExecutions: integer("total_executions").default(0).notNull(),
+  successCount: integer("success_count").default(0).notNull(),
+  failCount: integer("fail_count").default(0).notNull(),
+  avgLatencyMs: decimal("avg_latency_ms", { precision: 10, scale: 2 }),
+  totalTokens: integer("total_tokens").default(0),
+  uniqueAgents: integer("unique_agents").default(0),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+}, (table) => ({
+  toolDateIdx: uniqueIndex("exec_stats_tool_date_idx").on(table.toolId, table.date),
+}));
+
+// ── 10. Builder Accounts（Phase 3C）──
+
+export const builderAccounts = pgTable("builder_accounts", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  githubUserId: text("github_user_id").unique(),
+  githubUsername: text("github_username").notNull(),
+  email: text("email"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  lastLogin: timestamp("last_login", { withTimezone: true }),
+});
+
+// ── 11. Tool Claims（Phase 3C）──
+
+export const toolClaims = pgTable("tool_claims", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  builderId: uuid("builder_id")
+    .references(() => builderAccounts.id, { onDelete: "cascade" })
+    .notNull(),
+  serverId: uuid("server_id")
+    .references(() => servers.id, { onDelete: "cascade" })
+    .notNull(),
+  verificationMethod: text("verification_method").default("github_oauth"),
+  verified: boolean("verified").default(false),
+  claimedAt: timestamp("claimed_at", { withTimezone: true }).defaultNow(),
+}, (table) => ({
+  oneClaimPerServer: uniqueIndex("one_claim_per_server_idx").on(table.serverId),
+}));
+
+// ── 12. Governance Policies（Phase 3C）──
+
+export const governancePolicies = pgTable("governance_policies", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  orgName: text("org_name").notNull(),
+  defaultPolicy: text("default_policy").notNull().default("allow_verified_only"),
+  // "allow_all" | "allow_verified_only" | "block_all"
+  monthlyBudgetCap: decimal("monthly_budget_cap", { precision: 12, scale: 2 }),
+  createdBy: uuid("created_by")
+    .references(() => builderAccounts.id),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
+// ── 13. Tool Allowlist/Blocklist（Phase 3C）──
+
+export const governanceList = pgTable("governance_list", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  policyId: uuid("policy_id")
+    .references(() => governancePolicies.id, { onDelete: "cascade" })
+    .notNull(),
+  toolId: uuid("tool_id")
+    .references(() => tools.id, { onDelete: "cascade" })
+    .notNull(),
+  listType: text("list_type").notNull(), // "allow" | "block"
+  reason: text("reason"),
+  addedAt: timestamp("added_at", { withTimezone: true }).defaultNow(),
+}, (table) => ({
+  oneEntryPerTool: uniqueIndex("gov_list_tool_policy_idx").on(table.policyId, table.toolId),
+}));

@@ -622,6 +622,35 @@ footer { text-align:center; padding:40px 20px; color:#484f58; font-size:0.85em; 
   Sources: GitHub · npm · GitLab &nbsp;|&nbsp; 10 categories &nbsp;|&nbsp; Automated ingestion &nbsp;|&nbsp; <a href="/scoring/methodology" style="color:#7c9ff5">Full methodology →</a>
 </p>
 
+<div class="container" style="padding-top:8px">
+  <h2 style="font-size:1.25em;margin-bottom:20px;text-align:center;color:#e0e0e0">What would you like to do?</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px">
+
+    <div onclick="document.getElementById('search-input').focus()" style="background:#161b22;border:1px solid #21262d;border-radius:8px;padding:20px;cursor:pointer;transition:border-color 0.15s" onmouseover="this.style.borderColor='#7c9ff5'" onmouseout="this.style.borderColor='#21262d'">
+      <div style="font-size:1.4em;margin-bottom:8px">🔍</div>
+      <div style="font-weight:700;margin-bottom:4px;color:#e0e0e0">Search for tools</div>
+      <div style="color:#8b949e;font-size:0.88em">Agents: find the best tool for any task. Semantic search across 39K+ servers.</div>
+    </div>
+
+    <a href="/health/puppeteer/puppeteer" style="text-decoration:none;color:inherit">
+      <div style="background:#161b22;border:1px solid #21262d;border-radius:8px;padding:20px;cursor:pointer;transition:border-color 0.15s" onmouseover="this.style.borderColor='#28a745'" onmouseout="this.style.borderColor='#21262d'">
+        <div style="font-size:1.4em;margin-bottom:8px">🏆</div>
+        <div style="font-weight:700;margin-bottom:4px;color:#e0e0e0">Check your grade</div>
+        <div style="color:#8b949e;font-size:0.88em">Builders: paste your repo to see your score, get tips, and embed a badge.</div>
+      </div>
+    </a>
+
+    <a href="/scoring/methodology" style="text-decoration:none;color:inherit">
+      <div style="background:#161b22;border:1px solid #21262d;border-radius:8px;padding:20px;cursor:pointer;transition:border-color 0.15s" onmouseover="this.style.borderColor='#ffab00'" onmouseout="this.style.borderColor='#21262d'">
+        <div style="font-size:1.4em;margin-bottom:8px">📊</div>
+        <div style="font-weight:700;margin-bottom:4px;color:#e0e0e0">How scoring works</div>
+        <div style="color:#8b949e;font-size:0.88em">13 signal dimensions. Fully transparent methodology. No black box.</div>
+      </div>
+    </a>
+
+  </div>
+</div>
+
 <div class="container">
   <!-- Search -->
   <h2 style="margin-bottom:12px">Search Tools</h2>
@@ -666,7 +695,10 @@ footer { text-align:center; padding:40px 20px; color:#484f58; font-size:0.85em; 
 
   <!-- Grade Distribution -->
   <h2 style="margin-top:32px;margin-bottom:12px">Quality Grade Distribution</h2>
-  <div class="grade-dist">
+  <div style="max-width:960px;margin:32px auto 0;padding:0 20px">
+  <h2 style="font-size:1.2em;margin-bottom:16px;color:#e0e0e0">📈 Grade Distribution</h2>
+</div>
+<div class="grade-dist">
     ${gradeDist.map(g => `
       <div class="grade-bar">
         <div class="grade grade-${(g.grade || '').replace('+','-plus')}">${g.grade || '?'}</div>

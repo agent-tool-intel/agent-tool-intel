@@ -498,10 +498,34 @@ code { background:#0d1117; border:1px solid #30363d; border-radius:4px; padding:
 
 // ── Self-Check Redirect ──
 
-publicRoute.get("/check", (c) => {
-  const repo = c.req.query("repo") || "";
-  if (!repo.includes("/")) return c.redirect("/");
-  return c.redirect(`/health/${repo}`);
+publicRoute.get("/check", async (c) => {
+  const repo = (c.req.query("repo") || "").trim();
+  if (!repo) return c.redirect("/");
+
+  // If full org/repo → direct to health dashboard
+  if (repo.includes("/")) return c.redirect(`/health/${repo}`);
+
+  // Partial name → search for matching servers
+  const matches = await db
+    .select({ name: servers.name })
+    .from(servers)
+    .where(sql`${servers.name} ILIKE ${'%' + repo + '%'}`)
+    .limit(20);
+
+  if (matches.length === 1) return c.redirect(`/health/${matches[0]!.name}`);
+
+  // Show matching results or helpful error
+  const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Search: ${escapeHtml(repo)}</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:#0a0a0f;color:#e0e0e0;line-height:1.6;padding:40px 20px}.container{max-width:640px;margin:0 auto}h1{font-size:1.4em;margin-bottom:8px}.card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:16px;margin:8px 0;transition:border-color 0.15s}.card:hover{border-color:#7c9ff5}a{color:#7c9ff5;text-decoration:none}.dim{color:#8b949e;font-size:0.85em}.back{color:#7c9ff5}.tip{padding:16px;background:#161b22;border:1px solid #30363d;border-radius:8px;margin:16px 0}</style></head><body><div class="container"><a href="/" class="back">← Back</a><h1>Search: "${escapeHtml(repo)}"</h1>
+  ${matches.length > 0
+    ? `<p class="dim">Found ${matches.length} matching server${matches.length>1?'s':''}:</p>
+       ${matches.map(m => `<a href="/health/${m.name}"><div class="card">🔍 <strong>${escapeHtml(m.name)}</strong></div></a>`).join('')}`
+    : `<div class="tip"><p><strong>No results for "${escapeHtml(repo)}".</strong></p>
+       <p class="dim" style="margin-top:8px">Try entering the full GitHub repo name:</p>
+       <code style="display:block;background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:8px 12px;margin:8px 0;color:#7c9ff5">owner/repo</code>
+       <p class="dim">Example: <a href="/health/puppeteer/puppeteer">puppeteer/puppeteer</a></p></div>`
+  }
+  </div></body></html>`;
+  return c.html(matches.length > 0 ? html : html, matches.length > 0 ? 200 : 404);
 });
 
 // ── Homepage: Leaderboard ──

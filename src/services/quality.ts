@@ -11,7 +11,7 @@ interface ToolForScoring {
 export function scoreToolQuality(tool: ToolForScoring): Omit<QualityScore, "id" | "scoredAt"> {
   const issues: QualityIssue[] = [];
 
-  // 1. Schema Correctness (30%)
+  // 1. Schema Correctness (25%)
   const correctness = scoreCorrectness(tool, issues);
 
   // 2. Token Efficiency (25%)
@@ -23,15 +23,15 @@ export function scoreToolQuality(tool: ToolForScoring): Omit<QualityScore, "id" 
   // 4. Security (15%)
   const security = scoreSecurity(tool, issues);
 
-  // 5. Install Reliability (10%)
+  // 5. Install Reliability (15%)
   const installRel = scoreInstall(tool, issues);
 
   const overallScore =
-    correctness * 0.30 +
+    correctness * 0.25 +
     efficiency * 0.25 +
     descriptionQ * 0.20 +
     security * 0.15 +
-    installRel * 0.10;
+    installRel * 0.15;
 
   const grade = scoreToGrade(overallScore);
 
@@ -190,13 +190,124 @@ function scoreInstall(tool: ToolForScoring, issues: QualityIssue[]): number {
 }
 
 export function scoreToGrade(score: number): string {
-  // Aim for: ~5% A, ~25% B, ~45% C, ~25% D/F
-  // Calibrated against 19K tool population
+  // 8-grade mapping (2026-06-06)
+  // Designed for natural distribution via weighted composite
   if (score >= 90) return "A+";
   if (score >= 80) return "A";
-  if (score >= 72) return "B+";
-  if (score >= 64) return "B";
-  if (score >= 52) return "C";
-  if (score >= 38) return "D";
+  if (score >= 70) return "B+";
+  if (score >= 58) return "B";
+  if (score >= 48) return "C+";
+  if (score >= 38) return "C";
+  if (score >= 35) return "D";
   return "F";
+}
+
+/**
+ * Composite Grade = Quality(35%) + Community(35%) + Trust(30%)
+ * With Quality Floor: popular tools can't outrank quality excellence
+ */
+export function scoreCompositeGrade(qualityScore: number, communityScore: number, trustScore: number): {
+  composite: number;
+  grade: string;
+  qualityFloorCap: string | null;
+  breakdown: { quality: number; community: number; trust: number };
+} {
+  const composite = Math.round(
+    (qualityScore * 0.35 + communityScore * 0.35 + trustScore * 0.30) * 100
+  ) / 100;
+
+  const rawGrade = scoreToGrade(composite);
+
+  // Quality Floor: caps maximum grade based on quality score
+  let qualityFloorCap: string | null = null;
+  let grade = rawGrade;
+
+  const floorMap: Array<{ minQuality: number; maxGrade: string }> = [
+    { minQuality: 80, maxGrade: "A+" },   // Quality ≥ 80 → no cap
+    { minQuality: 70, maxGrade: "A" },     // Quality ≥ 70 → can reach A
+    { minQuality: 60, maxGrade: "B+" },    // Quality ≥ 60 → can reach B+
+    { minQuality: 50, maxGrade: "B" },     // Quality ≥ 50 → can reach B
+    { minQuality: 40, maxGrade: "C+" },    // Quality ≥ 40 → can reach C+
+    { minQuality: 30, maxGrade: "C" },     // Quality ≥ 30 → can reach C
+  ];
+
+  const GRADE_ORDER = ["F", "D", "C", "C+", "B", "B+", "A", "A+"];
+
+  for (const floor of floorMap) {
+    if (qualityScore >= floor.minQuality) break; // Quality passes this floor
+    // Quality too low → cap applies
+    const capIndex = GRADE_ORDER.indexOf(floor.maxGrade);
+    const rawIndex = GRADE_ORDER.indexOf(rawGrade);
+    if (rawIndex > capIndex) {
+      grade = floor.maxGrade;
+      qualityFloorCap = floor.maxGrade;
+      break;
+    }
+  }
+
+  return {
+    composite,
+    grade,
+    qualityFloorCap,
+    breakdown: { quality: qualityScore, community: communityScore, trust: trustScore },
+  };
+}
+
+/**
+ * Calculate Community Score from agent signals
+ * Stars (log scale, 0-50) + Activity (0-30) + Official (tiered, 0-20)
+ */
+export function scoreCommunity(stars: number, lastPushDaysAgo: number | null, isOfficial: boolean, isVerifiedPublisher: boolean): number {
+  // Stars: log scale
+  let starScore = 0;
+  if (stars >= 10000) starScore = 50;
+  else if (stars >= 1000) starScore = 45;
+  else if (stars >= 500) starScore = 40;
+  else if (stars >= 100) starScore = 32;
+  else if (stars >= 50) starScore = 25;
+  else if (stars >= 10) starScore = 18;
+  else if (stars >= 1) starScore = 10;
+
+  // Activity: time since last push
+  let activityScore = 0;
+  if (lastPushDaysAgo === null) activityScore = 5; // unknown
+  else if (lastPushDaysAgo <= 30) activityScore = 30;
+  else if (lastPushDaysAgo <= 180) activityScore = 20;
+  else if (lastPushDaysAgo <= 365) activityScore = 10;
+  // > 365 = abandoned = 0
+
+  // Official: tiered
+  let officialScore = 0;
+  if (isOfficial && isVerifiedPublisher) officialScore = 20;
+  else if (isOfficial) officialScore = 15;
+  else if (isVerifiedPublisher) officialScore = 10;
+
+  return Math.min(100, starScore + activityScore + officialScore);
+}
+
+/**
+ * Calculate Trust Score
+ * Success Rate (0-40, baseline 20) + Recency (0-30) + Consistency (0-30)
+ */
+export function scoreTrust(successRate: number | null, totalCalls: number, lastExecutionDaysAgo: number | null): number {
+  // If no real execution data → baseline 20
+  if (totalCalls === 0 || successRate === null) return 20;
+
+  // Success rate: scale from baseline
+  const successScore = Math.round((successRate / 100) * 40);
+
+  // Recency: recent executions matter
+  let recencyScore = 0;
+  if (lastExecutionDaysAgo === null) recencyScore = 10;
+  else if (lastExecutionDaysAgo <= 7) recencyScore = 30;
+  else if (lastExecutionDaysAgo <= 30) recencyScore = 20;
+  else if (lastExecutionDaysAgo <= 90) recencyScore = 10;
+
+  // Consistency: variance proxy
+  let consistencyScore = 20; // baseline
+  if (totalCalls >= 1000) consistencyScore = 30;
+  else if (totalCalls >= 100) consistencyScore = 25;
+  else if (totalCalls >= 10) consistencyScore = 20;
+
+  return Math.round(successScore + recencyScore + consistencyScore);
 }

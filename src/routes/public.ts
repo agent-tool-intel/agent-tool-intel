@@ -141,58 +141,77 @@ ${gradeDist.map(g => {
 </table>
 <p style="color:#8b949e;font-size:0.85em">Total tools scored: ${total.toLocaleString()}</p>
 
-<h2>1. Quality Score (Static Analysis)</h2>
-<p>Five dimensions, automatically evaluated from the tool definition. Weighted composite: 0-100.</p>
+<h2>1. Composite Grade (Three-Dimensional)</h2>
+<p>Your tool's overall grade combines three independent dimensions — designed to reflect how agents actually choose tools.</p>
 <table>
-<tr><th>Dimension</th><th>Weight</th><th>What we measure</th></tr>
-<tr><td>Schema Correctness</td><td>30%</td><td>Does the tool have a valid input/output schema? JSON Schema structure, type field, properties, required fields.</td></tr>
-<tr><td>Token Efficiency</td><td>25%</td><td>How many tokens does the tool definition consume? Every token counts against the agent's context window. ≤80 tokens = optimal.</td></tr>
-<tr><td>Description Quality</td><td>20%</td><td>Is the description clear, concise, and actionable? Length (50-200 chars optimal), action verbs, naming conventions.</td></tr>
-<tr><td>Security</td><td>15%</td><td>Prompt injection patterns, suspicious language, security keywords. No runtime sandbox yet.</td></tr>
-<tr><td>Install Reliability</td><td>10%</td><td>Can we detect the install method? HTTP endpoint vs npm/pip/go/cargo. Clear install instructions help.</td></tr>
+<tr><th>Component</th><th>Weight</th><th>What it measures</th></tr>
+<tr><td>Quality Score</td><td>35%</td><td>Static analysis of your tool definition (schema, efficiency, description, security, install). Foundation check.</td></tr>
+<tr><td>Community Score</td><td>35%</td><td>How agents gauge reliability: stars (log-scale), activity recency, and official/verified publisher status.</td></tr>
+<tr><td>Trust Score</td><td>30%</td><td>Real-world performance: success rate, execution recency, and consistency. Baseline 20 for all tools — rises with real agent usage.</td></tr>
+</table>
+
+<h3>Quality Floor</h3>
+<p>To prevent popular but poorly designed tools from outranking excellent new tools, your Community + Trust scores cannot push your grade beyond a cap based on Quality:</p>
+<table>
+<tr><th>If your Quality Score is...</th><th>Your maximum possible grade is...</th></tr>
+<tr><td>≥ 80</td><td>A+ (no cap)</td></tr>
+<tr><td>≥ 70</td><td>A</td></tr>
+<tr><td>≥ 60</td><td>B+</td></tr>
+<tr><td>≥ 50</td><td>B</td></tr>
+<tr><td>≥ 40</td><td>C+</td></tr>
+<tr><td>≥ 30</td><td>C</td></tr>
+<tr><td>&lt; 30</td><td>D</td></tr>
 </table>
 
 <h3>Grade Mapping</h3>
 <table>
-<tr><th>Score Range</th><th>Grade</th><th>Interpretation</th></tr>
-<tr><td>92-100</td><td>A+</td><td>Exceptional quality across all dimensions</td></tr>
-<tr><td>82-91</td><td>A</td><td>Strong quality, minor improvements possible</td></tr>
-<tr><td>74-81</td><td>B+</td><td>Good quality, some dimensions need attention</td></tr>
-<tr><td>66-73</td><td>B</td><td>Solid, with clear improvement areas</td></tr>
-<tr><td>55-65</td><td>C</td><td>Average — functional but needs work</td></tr>
-<tr><td>40-54</td><td>D</td><td>Below average — significant issues</td></tr>
-<tr><td>0-39</td><td>F</td><td>Critical issues — not recommended for agents</td></tr>
+<tr><th>Composite Score</th><th>Grade</th><th>What it means</th></tr>
+<tr><td>90-100</td><td>A+</td><td>Elite — agents default to these tools</td></tr>
+<tr><td>80-89</td><td>A</td><td>Excellent — close to the best</td></tr>
+<tr><td>70-79</td><td>B+</td><td>Very good — close to A, high motivation to improve</td></tr>
+<tr><td>58-69</td><td>B</td><td>Good — solid, room to grow</td></tr>
+<tr><td>48-57</td><td>C+</td><td>OK — above average, needs promotion or usage</td></tr>
+<tr><td>38-47</td><td>C</td><td>Needs work — below average, clear improvement path</td></tr>
+<tr><td>35-37</td><td>D</td><td>Poor — serious issues need attention</td></tr>
+<tr><td>0-34</td><td>F</td><td>Critical — not recommended for agents</td></tr>
 </table>
 
-<h2>2. Trust Score (Real-World Performance)</h2>
-<p>Derived from actual agent usage. Starts at 50 (neutral baseline) and improves as agents report success.</p>
+<h2>2. Quality Score (Static Analysis — 35% of composite)</h2>
+<p>Five dimensions automatically evaluated from the tool definition alone. No usage data required.</p>
+<table>
+<tr><th>Dimension</th><th>Weight</th><th>What we measure</th></tr>
+<tr><td>Schema Correctness</td><td>25%</td><td>Valid JSON Schema structure, type field, properties, required fields. Agents need clear schemas.</td></tr>
+<tr><td>Token Efficiency</td><td>25%</td><td>Tool definition token count. ≤80 tokens = optimal (🥇). Every token counts against context window.</td></tr>
+<tr><td>Description Quality</td><td>20%</td><td>Length (50-200 chars optimal), action verbs, naming conventions, usage examples.</td></tr>
+<tr><td>Security</td><td>15%</td><td>Prompt injection patterns, suspicious language, security keywords in description.</td></tr>
+<tr><td>Install Reliability</td><td>15%</td><td>Detected install method (npm/pip/go/docker). Clear install instructions = higher score.</td></tr>
+</table>
+
+<h2>3. Community Score (Social Proof — 35% of composite)</h2>
+<p>How agents gauge reliability through community signals. This is how agents actually decide what to trust.</p>
+<table>
+<tr><th>Signal</th><th>Weight</th><th>How it's scored</th></tr>
+<tr><td>GitHub Stars</td><td>0-50</td><td>Log-scale: 10K+⭐ = 50, 1K = 45, 100 = 32, 10 = 18, 1 = 10, 0 = 0</td></tr>
+<tr><td>Activity Recency</td><td>0-30</td><td>Push ≤30d = 30, ≤180d = 20, ≤365d = 10, abandoned = 0</td></tr>
+<tr><td>Official Status</td><td>0-20</td><td>Official + Verified = 20, Official = 15, Verified Publisher = 10</td></tr>
+</table>
+
+<h2>4. Trust Score (Real Performance — 30% of composite)</h2>
+<p>Real-world agent execution data. Currently at baseline (20) for all tools. As we gather real execution data through AgentPilot and partner integrations, Trust Scores will rise for tools that perform well.</p>
 <table>
 <tr><th>Signal</th><th>Weight</th><th>Source</th></tr>
-<tr><td>Success Rate</td><td>40%</td><td>Reported success/failure from agent calls</td></tr>
-<tr><td>Recency</td><td>25%</td><td>How recently was the tool used? Active tools score higher.</td></tr>
-<tr><td>Consistency</td><td>20%</td><td>Stability of success rate + user ratings</td></tr>
-<tr><td>Community</td><td>15%</td><td>Usage volume + GitHub engagement</td></tr>
+<tr><td>Success Rate</td><td>0-40</td><td>Real execution success/failure ratio (Phase 3)</td></tr>
+<tr><td>Recency</td><td>0-30</td><td>How recently was the tool executed? &lt;7d = 30</td></tr>
+<tr><td>Consistency</td><td>0-30</td><td>Volume-based: 1K+ calls = 30, 100+ = 25, 10+ = 20</td></tr>
 </table>
 
-<h2>3. Agent Signals (Discovery Metadata)</h2>
-<p>Signals that help agents decide whether to trust a tool before calling it.</p>
-<table>
-<tr><th>Signal</th><th>What it means</th></tr>
-<tr><td>Is Official</td><td>Maintained by the service provider or platform organization</td></tr>
-<tr><td>GitHub Stars</td><td>Community endorsement (log-scale scoring)</td></tr>
-<tr><td>Activity Status</td><td>Active (≤30d), Maintained (≤180d), Stale (≤365d), Abandoned (>365d)</td></tr>
-<tr><td>Community Score</td><td>Composite: stars (50%) + activity (35%) + official bonus (15%)</td></tr>
-</table>
-
-<h2>4. Discrepancy Flag</h2>
-<p>When quality and trust contradict each other, we flag it:</p>
+<h2>5. Why This Works</h2>
+<p>Previous system scored only quality — resulting in 85.7% Grade B (no differentiation). By combining quality with community and trust signals, we create natural spread that reflects how agents actually select tools: community reputation draws attention, quality verification closes the deal, real performance builds lasting trust.</p>
 <ul>
-<li><strong>Quality > Trust</strong>: Well-designed but unverified in production. Caution: may work on paper but not battle-tested.</li>
-<li><strong>Trust > Quality</strong>: Widely used despite design issues. Adoption paradox — works in practice but may have maintainability risks.</li>
+<li><strong>For Builders</strong>: Know exactly what to improve. Share your tool → more stars → better Community Score → higher grade.</li>
+<li><strong>For Agents</strong>: Clear differentiation. Community + Quality + Trust combine to surface truly reliable tools.</li>
+<li><strong>Quality Floor</strong>: Ensures popularity alone cannot outrank genuine quality. A tool with 10K stars but poor engineering cannot exceed Grade B.</li>
 </ul>
-
-<h2>5. Continuous Improvement</h2>
-<p>Scores are recalculated periodically. Improving your tool's schemas, descriptions, or install documentation directly improves your Quality Score. Real-world agent usage improves your Trust Score. We're actively calibrating based on ecosystem feedback.</p>
 
 <p style="color:#8b949e;font-size:0.85em;margin-top:30px;">Last updated: ${new Date().toISOString().slice(0, 10)}</p><footer style="text-align:center;padding:20px;color:#484f58;font-size:0.85em;border-top:1px solid #21262d;margin-top:20px"><a href="/" style="color:#7c9ff5">Home</a> · <a href="/docs" style="color:#7c9ff5">API Docs</a> · <a href="/scoring/methodology" style="color:#7c9ff5">Methodology</a> · <a href="/roadmap" style="color:#7c9ff5">Roadmap</a> · <a href="/partners" style="color:#7c9ff5">Partners</a> · <a href="/report/monthly" style="color:#7c9ff5">Monthly Report</a> · <a href="https://github.com/agent-tool-intel/agent-tool-intel" style="color:#7c9ff5">GitHub</a> · <a href="https://github.com/agent-tool-intel/agent-tool-intel/blob/master/CONTRIBUTING.md" style="color:#7c9ff5">Contribute</a></footer>
 </div>
@@ -518,7 +537,7 @@ publicRoute.get("/", async (c) => {
     cacheTime = now;
   }
 
-  // Get top 20 tools by quality score（not cached — dynamic）
+  // Get top tools — A and A+ only（not cached — dynamic）
   const topTools = await db
     .select({
       toolName: tools.name,
@@ -532,6 +551,7 @@ publicRoute.get("/", async (c) => {
     .from(tools)
     .innerJoin(servers, eq(tools.serverId, servers.id))
     .innerJoin(qualityScores, eq(tools.id, qualityScores.toolId))
+    .where(sql`${qualityScores.grade} IN ('A+', 'A')`)
     .orderBy(desc(qualityScores.overallScore))
     .limit(20);
 

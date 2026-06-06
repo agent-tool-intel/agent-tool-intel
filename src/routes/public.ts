@@ -425,11 +425,10 @@ ${(() => {
 <h2>💡 Improvement Tips</h2>
 ${tips.map(t => `<div class="tip ${t.includes('Great job') ? 'good' : ''}">${t}</div>`).join('')}
 
-<h2>💰 Builder Incentive</h2>
+<h2>🚀 How to Improve Your Grade</h2>
 <div class="card" style="border-left:3px solid #ffab00">
-<p class="dim">Real execution data feeds back into your quality and trust scores — creating a virtuous cycle of improvement and discovery.</p>
-<p class="dim" style="margin:8px 0">Estimated: $0.001/call → <strong>$0.0009 to you</strong>. 10K calls/month = $9/month passive income.</p>
-<p class="dim">Higher grade = more agent trust = more calls = more earnings. <a href="/scoring/methodology" style="color:#7c9ff5">Improve your grade →</a></p>
+<p class="dim" style="margin-bottom:8px">Your grade comes from three components: <strong>Quality Score</strong> (your tool definition) + <strong>Community Bonus</strong> (stars, activity, official status) + <strong>Trust Bonus</strong> (real usage data, coming soon).</p>
+<p class="dim">To move up: improve your lowest quality dimension, get more GitHub stars, push updates regularly, and embed your badge. <a href="/scoring/methodology" style="color:#7c9ff5">Full methodology →</a></p>
 </div>
 
 <h2>🔗 Resources</h2>

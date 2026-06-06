@@ -178,6 +178,7 @@ export function scoreCompositeGrade(qualityScore: number, communityBonus: number
 
   // 8-grade mapping — Final（2026-06-06）
   // FDC customized, C+↑ from Option 2
+  let grade: string;
   if (composite >= 131) grade = "A+";
   else if (composite >= 106) grade = "A";
   else if (composite >= 86)  grade = "B+";

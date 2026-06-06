@@ -178,14 +178,14 @@ export function scoreCompositeGrade(qualityScore: number, communityBonus: number
 
   // 8-grade mapping — Final（2026-06-06）
   // FDC customized, C+↑ from Option 2
-  if (composite >= 131) return "A+";
-  if (composite >= 106) return "A";
-  if (composite >= 86)  return "B+";
-  if (composite >= 76)  return "B";
-  if (composite >= 66)  return "C+";
-  if (composite >= 46)  return "C";
-  if (composite >= 21)  return "D";
-  return "F";
+  if (composite >= 131) grade = "A+";
+  else if (composite >= 106) grade = "A";
+  else if (composite >= 86)  grade = "B+";
+  else if (composite >= 76)  grade = "B";
+  else if (composite >= 66)  grade = "C+";
+  else if (composite >= 46)  grade = "C";
+  else if (composite >= 21)  grade = "D";
+  else grade = "F";
 
   // Quality Floor: caps max grade
   const floorMap: Array<{ minQ: number; maxGrade: string }> = [

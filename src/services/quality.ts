@@ -254,38 +254,6 @@ export function scoreCompositeGrade(qualityScore: number, communityScore: number
 }
 
 /**
- * Calculate Community Score from agent signals
- * Stars (log scale, 0-50) + Activity (0-30) + Official (tiered, 0-20)
- */
-export function scoreCommunity(stars: number, lastPushDaysAgo: number | null, isOfficial: boolean, isVerifiedPublisher: boolean): number {
-  // Stars: log scale
-  let starScore = 0;
-  if (stars >= 10000) starScore = 50;
-  else if (stars >= 1000) starScore = 45;
-  else if (stars >= 500) starScore = 40;
-  else if (stars >= 100) starScore = 32;
-  else if (stars >= 50) starScore = 25;
-  else if (stars >= 10) starScore = 18;
-  else if (stars >= 1) starScore = 10;
-
-  // Activity: time since last push
-  let activityScore = 0;
-  if (lastPushDaysAgo === null) activityScore = 5; // unknown
-  else if (lastPushDaysAgo <= 30) activityScore = 30;
-  else if (lastPushDaysAgo <= 180) activityScore = 20;
-  else if (lastPushDaysAgo <= 365) activityScore = 10;
-  // > 365 = abandoned = 0
-
-  // Official: tiered
-  let officialScore = 0;
-  if (isOfficial && isVerifiedPublisher) officialScore = 20;
-  else if (isOfficial) officialScore = 15;
-  else if (isVerifiedPublisher) officialScore = 10;
-
-  return Math.min(100, starScore + activityScore + officialScore);
-}
-
-/**
  * Calculate Trust Score
  * Success Rate (0-40) + Recency (0-30) + Consistency (0-30)
  * IMPORTANT: Baseline is 40 — all tools start here, rise with real data

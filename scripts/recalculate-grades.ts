@@ -1,19 +1,22 @@
 // Recalculate all server grades using new 35/35/30 composite formula
 // Run: npx tsx scripts/recalculate-grades.ts
+// IMPORTANT: Re-computes quality scores from tool data, does NOT overwrite them
 
 import { db } from "../src/db/index.js";
 import { servers, tools, qualityScores } from "../src/db/schema.js";
-import { scoreCompositeGrade, scoreCommunity, scoreTrust, scoreToGrade } from "../src/services/quality.js";
-import { eq, sql } from "drizzle-orm";
+import { scoreCompositeGrade, scoreCommunity, scoreTrust, scoreToolQuality } from "../src/services/quality.js";
+import { eq } from "drizzle-orm";
 
 async function main() {
   console.log("Starting grade recalculation...\n");
 
-  // Get all tools with scores and server metadata
   const allTools = await db
     .select({
       toolId: tools.id,
       toolName: tools.name,
+      toolDesc: tools.description,
+      toolSchema: tools.inputSchema,
+      toolTokens: tools.tokenCount,
       qualityOverall: qualityScores.overallScore,
       qualityCorrectness: qualityScores.correctness,
       qualityEfficiency: qualityScores.efficiency,
@@ -21,7 +24,6 @@ async function main() {
       qualitySecurity: qualityScores.security,
       qualityInstall: qualityScores.installRel,
       currentGrade: qualityScores.grade,
-      serverId: servers.id,
       serverName: servers.name,
       metadata: servers.metadata,
     })
@@ -33,11 +35,20 @@ async function main() {
 
   const distribution: Record<string, number> = {};
   let updated = 0;
-  let debugCount = 0;
 
   for (const row of allTools) {
-    // Calculate Community Score
-    const meta = row.metadata as Record<string, any> || {};
+    // 1. Re-compute Quality Score from tool definition（NOT from stored score）
+    const qualityResult = scoreToolQuality({
+      id: row.toolId,
+      name: row.toolName,
+      description: row.toolDesc,
+      inputSchema: row.toolSchema as Record<string, unknown> | null,
+      tokenCount: row.toolTokens,
+    });
+    const qualityScore = qualityResult.overallScore;
+
+    // 2. Community Score
+    const meta = (row.metadata || {}) as Record<string, any>;
     const stars = meta?.stars || 0;
     const pushedAt = meta?.pushed_at;
     const lastPushDaysAgo = pushedAt
@@ -45,46 +56,37 @@ async function main() {
       : null;
     const isOfficial = meta?.is_official || false;
     const isVerifiedPublisher = meta?.is_verified_publisher || false;
-
     const communityScore = scoreCommunity(stars, lastPushDaysAgo, isOfficial, isVerifiedPublisher);
 
-    // Calculate Trust Score (baseline for now)
+    // 3. Trust Score（baseline for now）
     const totalCalls = meta?.total_calls || 0;
     const successRate = meta?.success_rate || null;
     const trustScore = scoreTrust(successRate, totalCalls, null);
 
-    // Calculate Composite Grade
-    // Drizzle decimal returns string — parse carefully
-    const qualityScore = parseFloat(String(row.qualityOverall || "0")) || 0;
-    const { composite, grade, qualityFloorCap } = scoreCompositeGrade(qualityScore, communityScore, trustScore);
+    // 4. Composite Grade
+    const { composite, grade } = scoreCompositeGrade(qualityScore, communityScore, trustScore);
 
-    // Debug: print first 5 tools
-    if (debugCount < 5) {
-      console.log(`\nDEBUG #${debugCount+1}: ${row.serverName}/${row.toolName}`);
-      console.log(`  qualityOverall(raw): "${row.qualityOverall}" → parsed: ${qualityScore}`);
-      console.log(`  stars: ${stars}  pushDaysAgo: ${lastPushDaysAgo}  official: ${isOfficial}`);
-      console.log(`  Quality:${qualityScore} Community:${communityScore} Trust:${trustScore}`);
-      console.log(`  Composite:${composite} Grade:${grade}  OldGrade:${row.currentGrade}`);
-    }
-    debugCount++;
-
-    // Update grade if changed
-    if (grade !== row.currentGrade) {
+    // 5. Update: new quality score + composite + grade（don't overwrite quality）
+    if (grade !== row.currentGrade || Math.abs(qualityScore - parseFloat(String(row.qualityOverall || "0"))) > 1) {
       await db
         .update(qualityScores)
         .set({
+          overallScore: qualityScore.toFixed(2),  // Store QUALITY score, not composite
           grade,
-          overallScore: composite.toFixed(2),
+          correctness: qualityResult.correctness,
+          efficiency: qualityResult.efficiency,
+          descriptionQ: qualityResult.descriptionQ,
+          security: qualityResult.security,
+          installRel: qualityResult.installRel,
           updatedAt: new Date(),
         } as any)
         .where(eq(qualityScores.toolId, row.toolId));
-
       updated++;
     }
 
     distribution[grade] = (distribution[grade] || 0) + 1;
 
-    if (updated % 1000 === 0 && updated > 0) {
+    if (updated % 5000 === 0 && updated > 0) {
       console.log(`  Updated ${updated} tools...`);
     }
   }

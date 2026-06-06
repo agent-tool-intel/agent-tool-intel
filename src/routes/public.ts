@@ -164,14 +164,15 @@ ${gradeDist.map(g => {
 </table>
 
 <h3>Grade Mapping</h3>
+<p>Calibrated to 35/35/30 composite score range (typical score: 35-60, median ~42).</p>
 <table>
 <tr><th>Composite Score</th><th>Grade</th><th>What it means</th></tr>
-<tr><td>90-100</td><td>A+</td><td>Elite — agents default to these tools</td></tr>
-<tr><td>80-89</td><td>A</td><td>Excellent — close to the best</td></tr>
-<tr><td>70-79</td><td>B+</td><td>Very good — close to A, high motivation to improve</td></tr>
-<tr><td>58-69</td><td>B</td><td>Good — solid, room to grow</td></tr>
-<tr><td>48-57</td><td>C+</td><td>OK — above average, needs promotion or usage</td></tr>
-<tr><td>38-47</td><td>C</td><td>Needs work — below average, clear improvement path</td></tr>
+<tr><td>65+</td><td>A+</td><td>Elite — agents default to these tools</td></tr>
+<tr><td>55-64</td><td>A</td><td>Excellent — close to the best</td></tr>
+<tr><td>50-54</td><td>B+</td><td>Very good — close to A, high motivation to improve</td></tr>
+<tr><td>46-49</td><td>B</td><td>Good — solid, room to grow</td></tr>
+<tr><td>43-45</td><td>C+</td><td>OK — above average, needs promotion or usage</td></tr>
+<tr><td>38-42</td><td>C</td><td>Needs work — below average, clear improvement path</td></tr>
 <tr><td>35-37</td><td>D</td><td>Poor — serious issues need attention</td></tr>
 <tr><td>0-34</td><td>F</td><td>Critical — not recommended for agents</td></tr>
 </table>

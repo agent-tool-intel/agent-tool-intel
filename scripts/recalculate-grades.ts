@@ -33,6 +33,7 @@ async function main() {
 
   const distribution: Record<string, number> = {};
   let updated = 0;
+  let debugCount = 0;
 
   for (const row of allTools) {
     // Calculate Community Score
@@ -56,6 +57,16 @@ async function main() {
     // Drizzle decimal returns string — parse carefully
     const qualityScore = parseFloat(String(row.qualityOverall || "0")) || 0;
     const { composite, grade, qualityFloorCap } = scoreCompositeGrade(qualityScore, communityScore, trustScore);
+
+    // Debug: print first 5 tools
+    if (debugCount < 5) {
+      console.log(`\nDEBUG #${debugCount+1}: ${row.serverName}/${row.toolName}`);
+      console.log(`  qualityOverall(raw): "${row.qualityOverall}" → parsed: ${qualityScore}`);
+      console.log(`  stars: ${stars}  pushDaysAgo: ${lastPushDaysAgo}  official: ${isOfficial}`);
+      console.log(`  Quality:${qualityScore} Community:${communityScore} Trust:${trustScore}`);
+      console.log(`  Composite:${composite} Grade:${grade}  OldGrade:${row.currentGrade}`);
+    }
+    debugCount++;
 
     // Update grade if changed
     if (grade !== row.currentGrade) {

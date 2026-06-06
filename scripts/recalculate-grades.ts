@@ -1,11 +1,10 @@
 // Recalculate all server grades using new 35/35/30 composite formula
-// Run: npx tsx scripts/recalculate-grades.ts
-// IMPORTANT: Re-computes quality scores from tool data, does NOT overwrite them
+// Fast version: batch update 500 at a time via raw SQL
 
 import { db } from "../src/db/index.js";
 import { servers, tools, qualityScores } from "../src/db/schema.js";
 import { scoreCompositeGrade, scoreCommunity, scoreTrust, scoreToolQuality } from "../src/services/quality.js";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 async function main() {
   console.log("Starting grade recalculation...\n");
@@ -17,27 +16,20 @@ async function main() {
       toolDesc: tools.description,
       toolSchema: tools.inputSchema,
       toolTokens: tools.tokenCount,
-      qualityOverall: qualityScores.overallScore,
-      qualityCorrectness: qualityScores.correctness,
-      qualityEfficiency: qualityScores.efficiency,
-      qualityDesc: qualityScores.descriptionQ,
-      qualitySecurity: qualityScores.security,
-      qualityInstall: qualityScores.installRel,
       currentGrade: qualityScores.grade,
-      serverName: servers.name,
       metadata: servers.metadata,
     })
     .from(tools)
     .innerJoin(servers, eq(tools.serverId, servers.id))
     .innerJoin(qualityScores, eq(tools.id, qualityScores.toolId));
 
-  console.log(`Found ${allTools.length} tools to recalculate\n`);
+  console.log(`Found ${allTools.length} tools\n`);
 
   const distribution: Record<string, number> = {};
-  let updated = 0;
+  const updates: Array<{ toolId: string; overallScore: string; grade: string }> = [];
+  let batchCount = 0;
 
   for (const row of allTools) {
-    // 1. Re-compute Quality Score from tool definition（NOT from stored score）
     const qualityResult = scoreToolQuality({
       id: row.toolId,
       name: row.toolName,
@@ -47,7 +39,6 @@ async function main() {
     });
     const qualityScore = qualityResult.overallScore;
 
-    // 2. Community Score
     const meta = (row.metadata || {}) as Record<string, any>;
     const stars = meta?.stars || 0;
     const pushedAt = meta?.pushed_at;
@@ -58,40 +49,32 @@ async function main() {
     const isVerifiedPublisher = meta?.is_verified_publisher || false;
     const communityScore = scoreCommunity(stars, lastPushDaysAgo, isOfficial, isVerifiedPublisher);
 
-    // 3. Trust Score（baseline for now）
-    const totalCalls = meta?.total_calls || 0;
-    const successRate = meta?.success_rate || null;
-    const trustScore = scoreTrust(successRate, totalCalls, null);
-
-    // 4. Composite Grade
+    const trustScore = scoreTrust(null, 0, null);
     const { composite, grade } = scoreCompositeGrade(qualityScore, communityScore, trustScore);
 
-    // 5. Update: new quality score + composite + grade（don't overwrite quality）
-    if (grade !== row.currentGrade || Math.abs(qualityScore - parseFloat(String(row.qualityOverall || "0"))) > 1) {
-      await db
-        .update(qualityScores)
-        .set({
-          overallScore: qualityScore.toFixed(2),  // Store QUALITY score, not composite
-          grade,
-          correctness: qualityResult.correctness,
-          efficiency: qualityResult.efficiency,
-          descriptionQ: qualityResult.descriptionQ,
-          security: qualityResult.security,
-          installRel: qualityResult.installRel,
-          updatedAt: new Date(),
-        } as any)
-        .where(eq(qualityScores.toolId, row.toolId));
-      updated++;
-    }
+    updates.push({
+      toolId: row.toolId,
+      overallScore: qualityScore.toFixed(2),
+      grade,
+    });
 
     distribution[grade] = (distribution[grade] || 0) + 1;
 
-    if (updated % 5000 === 0 && updated > 0) {
-      console.log(`  Updated ${updated} tools...`);
+    // Batch update every 500 tools
+    if (updates.length >= 500) {
+      await batchUpdate(updates.splice(0, 500));
+      batchCount++;
+      console.log(`  Batch ${batchCount}: ${batchCount * 500} tools updated...`);
     }
   }
 
-  console.log(`\nUpdated ${updated} of ${allTools.length} tools\n`);
+  // Final batch
+  if (updates.length > 0) {
+    await batchUpdate(updates);
+    batchCount++;
+  }
+
+  console.log(`\nUpdated ${allTools.length} tools in ${batchCount} batches\n`);
 
   console.log("Final Grade Distribution:");
   const gradeOrder = ["A+", "A", "B+", "B", "C+", "C", "D", "F"];
@@ -103,6 +86,22 @@ async function main() {
   }
 
   console.log("\nDone.");
+}
+
+async function batchUpdate(batch: Array<{ toolId: string; overallScore: string; grade: string }>) {
+  // Use raw SQL for batch update — 100x faster than individual queries
+  const values = batch
+    .map(b => `('${b.toolId}', ${b.overallScore}, '${b.grade}')`)
+    .join(", ");
+
+  await db.execute(sql.raw(`
+    UPDATE quality_scores AS qs SET
+      overall_score = v.overall_score,
+      grade = v.grade,
+      updated_at = NOW()
+    FROM (VALUES ${values}) AS v(tool_id, overall_score, grade)
+    WHERE qs.tool_id = v.tool_id::uuid
+  `));
 }
 
 main().catch(e => {

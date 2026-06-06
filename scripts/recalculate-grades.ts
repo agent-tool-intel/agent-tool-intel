@@ -49,7 +49,7 @@ async function main() {
   results.sort((a, b) => b.composite - a.composite);
   const n = results.length;
 
-  const percentile = (pct: number) => results[Math.floor(n * pct)]?.composite || 0;
+  const percentile = (pct: number) => results[Math.floor(n * pct)]!.composite || 0;
 
   console.log("Score percentiles:");
   console.log(`  Top 1%: ≥${percentile(0.01).toFixed(1)}`);

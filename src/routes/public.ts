@@ -188,21 +188,23 @@ ${gradeDist.map(g => {
 </table>
 
 <h2>3. Community Score (Social Proof — 35% of composite)</h2>
-<p>How agents gauge reliability through community signals. This is how agents actually decide what to trust.</p>
+<p>How agents gauge reliability through community signals. Every active tool gets a floor of <strong>10 points</strong> — agents recognize that all tools start somewhere.</p>
 <table>
-<tr><th>Signal</th><th>Weight</th><th>How it's scored</th></tr>
-<tr><td>GitHub Stars</td><td>0-50</td><td>Log-scale: 10K+⭐ = 50, 1K = 45, 100 = 32, 10 = 18, 1 = 10, 0 = 0</td></tr>
-<tr><td>Activity Recency</td><td>0-30</td><td>Push ≤30d = 30, ≤180d = 20, ≤365d = 10, abandoned = 0</td></tr>
-<tr><td>Official Status</td><td>0-20</td><td>Official + Verified = 20, Official = 15, Verified Publisher = 10</td></tr>
+<tr><th>Signal</th><th>Max</th><th>How scored</th></tr>
+<tr><td>GitHub Stars</td><td>50</td><td>Log-scale: 10K+=50, 1K=45, 500=40, 100=32, 50=25, 10=18, 5=12, 1=8, 0=0</td></tr>
+<tr><td>Activity</td><td>30</td><td>Push ≤30d=30, ≤180d=20, ≤365d=10, unknown=10, abandoned=0</td></tr>
+<tr><td>Official</td><td>20</td><td>Official+Verified=20, Official=15, Verified=10, none=0</td></tr>
+<tr><td colspan="3"><strong>Floor: 5</strong> for any tool · Active tools: min <strong>10</strong></td></tr>
 </table>
 
 <h2>4. Trust Score (Real Performance — 30% of composite)</h2>
-<p>Real-world agent execution data. Currently at baseline (20) for all tools. As we gather real execution data through AgentPilot and partner integrations, Trust Scores will rise for tools that perform well.</p>
+<p>Real-world agent execution data. All tools start at baseline <strong>40</strong> (benefit of doubt). As we gather real execution data through AgentPilot and partner integrations, Trust Scores rise for tools that perform well, or fall for tools that fail.</p>
 <table>
-<tr><th>Signal</th><th>Weight</th><th>Source</th></tr>
-<tr><td>Success Rate</td><td>0-40</td><td>Real execution success/failure ratio (Phase 3)</td></tr>
-<tr><td>Recency</td><td>0-30</td><td>How recently was the tool executed? &lt;7d = 30</td></tr>
-<tr><td>Consistency</td><td>0-30</td><td>Volume-based: 1K+ calls = 30, 100+ = 25, 10+ = 20</td></tr>
+<tr><th>Signal</th><th>Max</th><th>How scored</th></tr>
+<tr><td>Success Rate</td><td>40</td><td>Real execution success/failure ratio. No data = 0 of 40.</td></tr>
+<tr><td>Recency</td><td>30</td><td>Last execution: ≤7d = 30, ≤30d = 20, ≤90d = 10, unknown = 10</td></tr>
+<tr><td>Consistency</td><td>30</td><td>Volume proxy: 1K+ calls = 30, 100+ = 28, 10+ = 25, none = 25</td></tr>
+<tr><td colspan="3"><strong>Baseline (no data): 40</strong> — tool gets benefit of doubt</td></tr>
 </table>
 
 <h2>5. Why This Works</h2>

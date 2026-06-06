@@ -551,6 +551,9 @@ publicRoute.get("/", async (c) => {
 <meta name="twitter:title" content="Agent Tool Intelligence — MCP Tool Quality Scores">
 <meta name="twitter:description" content="39,752+ MCP servers scored. The quality layer for AI agent tools.">
 <meta name="robots" content="index, follow">
+<meta property="og:image" content="https://agent-tool-intel-production.up.railway.app/badge/puppeteer%2Fpuppeteer">
+<meta property="og:image:width" content="170">
+<meta property="og:image:height" content="20">
 <link rel="canonical" href="https://agent-tool-intel-production.up.railway.app">
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }

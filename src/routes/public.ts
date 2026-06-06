@@ -141,13 +141,14 @@ ${gradeDist.map(g => {
 </table>
 <p style="color:#8b949e;font-size:0.85em">Total tools scored: ${total.toLocaleString()}</p>
 
-<h2>1. Composite Grade (Three-Dimensional)</h2>
-<p>Your tool's overall grade combines three independent dimensions — designed to reflect how agents actually choose tools.</p>
+<h2>1. Composite Grade（Additive Model）</h2>
+<p><strong>Quality is the foundation. Community and Trust are bonuses — they add on top, they never drag you down.</strong></p>
 <table>
-<tr><th>Component</th><th>Weight</th><th>What it measures</th></tr>
-<tr><td>Quality Score</td><td>35%</td><td>Static analysis of your tool definition (schema, efficiency, description, security, install). Foundation check.</td></tr>
-<tr><td>Community Score</td><td>35%</td><td>How agents gauge reliability: stars (log-scale), activity recency, and official/verified publisher status.</td></tr>
-<tr><td>Trust Score</td><td>30%</td><td>Real-world performance: success rate, execution recency, and consistency. Baseline 20 for all tools — rises with real agent usage.</td></tr>
+<tr><th>Component</th><th>Range</th><th>What it measures</th></tr>
+<tr><td>Quality Score</td><td>0-100</td><td>Static analysis of your tool definition. Your <strong>base score</strong>.</td></tr>
+<tr><td>Community Bonus</td><td>0-30</td><td>Stars, activity, official status. <strong>Adds on top</strong> of quality.</td></tr>
+<tr><td>Trust Bonus</td><td>0-20</td><td>Real execution data. <strong>Adds on top</strong>. No data = no bonus (not a penalty).</td></tr>
+<tr><td colspan="3"><strong>Composite = Quality + Community Bonus + Trust Bonus (0-150)</strong></td></tr>
 </table>
 
 <h3>Quality Floor</h3>
@@ -163,17 +164,16 @@ ${gradeDist.map(g => {
 <tr><td>&lt; 30</td><td>D</td></tr>
 </table>
 
-<h3>Grade Mapping</h3>
-<p>Calibrated to 35/35/30 composite score range (typical score: 35-60, median ~42).</p>
+<h3>Grade Mapping（0-150 Scale）</h3>
 <table>
 <tr><th>Composite Score</th><th>Grade</th><th>What it means</th></tr>
-<tr><td>65+</td><td>A+</td><td>Elite — agents default to these tools</td></tr>
-<tr><td>55-64</td><td>A</td><td>Excellent — close to the best</td></tr>
-<tr><td>50-54</td><td>B+</td><td>Very good — close to A, high motivation to improve</td></tr>
-<tr><td>46-49</td><td>B</td><td>Good — solid, room to grow</td></tr>
-<tr><td>43-45</td><td>C+</td><td>OK — above average, needs promotion or usage</td></tr>
-<tr><td>38-42</td><td>C</td><td>Needs work — below average, clear improvement path</td></tr>
-<tr><td>35-37</td><td>D</td><td>Poor — serious issues need attention</td></tr>
+<tr><td>120-150</td><td>A+</td><td>Elite — quality + popularity + real usage</td></tr>
+<tr><td>100-119</td><td>A</td><td>Excellent — strong across all dimensions</td></tr>
+<tr><td>85-99</td><td>B+</td><td>Very good — close to A, clear path to improve</td></tr>
+<tr><td>70-84</td><td>B</td><td>Good — solid quality, room to grow community</td></tr>
+<tr><td>58-69</td><td>C+</td><td>OK — decent quality, needs promotion or usage</td></tr>
+<tr><td>45-57</td><td>C</td><td>Needs work — quality issues or no community signal</td></tr>
+<tr><td>35-44</td><td>D</td><td>Poor — significant quality or maintenance issues</td></tr>
 <tr><td>0-34</td><td>F</td><td>Critical — not recommended for agents</td></tr>
 </table>
 
@@ -188,24 +188,24 @@ ${gradeDist.map(g => {
 <tr><td>Install Reliability</td><td>15%</td><td>Detected install method (npm/pip/go/docker). Clear install instructions = higher score.</td></tr>
 </table>
 
-<h2>3. Community Score (Social Proof — 35% of composite)</h2>
-<p>How agents gauge reliability through community signals. Every active tool gets a floor of <strong>10 points</strong> — agents recognize that all tools start somewhere.</p>
+<h2>3. Community Bonus（Adds 0-30 points）</h2>
+<p>How agents gauge reliability through community signals. Stars, activity, and official status <strong>add points</strong> on top of quality — never drag you down.</p>
 <table>
 <tr><th>Signal</th><th>Max</th><th>How scored</th></tr>
-<tr><td>GitHub Stars</td><td>50</td><td>Log-scale: 10K+=50, 1K=45, 500=40, 100=32, 50=25, 10=18, 5=12, 1=8, 0=0</td></tr>
-<tr><td>Activity</td><td>30</td><td>Push ≤30d=30, ≤180d=20, ≤365d=10, unknown=10, abandoned=0</td></tr>
-<tr><td>Official</td><td>20</td><td>Official+Verified=20, Official=15, Verified=10, none=0</td></tr>
-<tr><td colspan="3"><strong>Floor: 5</strong> for any tool · Active tools: min <strong>10</strong></td></tr>
+<tr><td>GitHub Stars</td><td>15</td><td>10K+=15, 1K=13, 500=11, 100=9, 50=7, 10=5, 1=3, 0=0</td></tr>
+<tr><td>Activity</td><td>10</td><td>Push ≤30d=10, ≤180d=6, ≤365d=3, unknown=3, abandoned=0</td></tr>
+<tr><td>Official</td><td>5</td><td>Official+Verified=5, Official=4, Verified=3, none=0</td></tr>
+<tr><td colspan="3"><strong>Max bonus: 30</strong> points added to your Quality Score</td></tr>
 </table>
 
-<h2>4. Trust Score (Real Performance — 30% of composite)</h2>
-<p>Real-world agent execution data. All tools start at baseline <strong>40</strong> (benefit of doubt). As we gather real execution data through AgentPilot and partner integrations, Trust Scores rise for tools that perform well, or fall for tools that fail.</p>
+<h2>4. Trust Bonus（Adds 0-20 points）</h2>
+<p>Real-world agent execution data from Phase 3. <strong>No data = no bonus, not a penalty.</strong> Tools with proven execution success earn additional points.</p>
 <table>
 <tr><th>Signal</th><th>Max</th><th>How scored</th></tr>
-<tr><td>Success Rate</td><td>40</td><td>Real execution success/failure ratio. No data = 0 of 40.</td></tr>
-<tr><td>Recency</td><td>30</td><td>Last execution: ≤7d = 30, ≤30d = 20, ≤90d = 10, unknown = 10</td></tr>
-<tr><td>Consistency</td><td>30</td><td>Volume proxy: 1K+ calls = 30, 100+ = 28, 10+ = 25, none = 25</td></tr>
-<tr><td colspan="3"><strong>Baseline (no data): 40</strong> — tool gets benefit of doubt</td></tr>
+<tr><td>Success Rate</td><td>10</td><td>% success × 0.1. No data = 0.</td></tr>
+<tr><td>Recency</td><td>5</td><td>Executed ≤7d=5, ≤30d=3, unknown=0</td></tr>
+<tr><td>Consistency</td><td>5</td><td>1K+ calls=5, 100+=3, none=0</td></tr>
+<tr><td colspan="3"><strong>Baseline (no data): 0</strong> — bonus only for proven tools</td></tr>
 </table>
 
 <h2>5. Why This Works</h2>

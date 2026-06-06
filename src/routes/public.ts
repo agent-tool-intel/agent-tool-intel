@@ -164,17 +164,17 @@ ${gradeDist.map(g => {
 <tr><td>&lt; 30</td><td>D</td></tr>
 </table>
 
-<h3>Grade Mapping（0-150 Scale）</h3>
+<h3>Grade Mapping — Final</h3>
 <table>
-<tr><th>Composite Score</th><th>Grade</th><th>What it means</th></tr>
-<tr><td>95+</td><td>A+</td><td>Elite — quality + popularity + real usage</td></tr>
-<tr><td>85-94</td><td>A</td><td>Excellent — strong across all dimensions</td></tr>
-<tr><td>78-84</td><td>B+</td><td>Very good — close to A, clear path to improve</td></tr>
-<tr><td>70-77</td><td>B</td><td>Good — solid quality, room to grow community</td></tr>
-<tr><td>62-69</td><td>C+</td><td>OK — decent quality, needs promotion or usage</td></tr>
-<tr><td>54-61</td><td>C</td><td>Needs work — quality issues or no community signal</td></tr>
-<tr><td>45-53</td><td>D</td><td>Poor — significant quality or maintenance issues</td></tr>
-<tr><td>0-44</td><td>F</td><td>Critical — not recommended for agents</td></tr>
+<tr><th>Score</th><th>Grade</th><th>Width</th><th>Meaning</th></tr>
+<tr><td>131-150</td><td>A+</td><td>20</td><td>Elite — quality + popularity + usage</td></tr>
+<tr><td>106-130</td><td>A</td><td>25</td><td>Excellent</td></tr>
+<tr><td>86-105</td><td>B+</td><td>20</td><td>Very good — close to A</td></tr>
+<tr><td>76-85</td><td>B</td><td>10</td><td>Good — solid quality</td></tr>
+<tr><td>66-75</td><td>C+</td><td>10</td><td>OK — needs promotion</td></tr>
+<tr><td>46-65</td><td>C</td><td>20</td><td>Below average — quality gaps</td></tr>
+<tr><td>21-45</td><td>D</td><td>25</td><td>Poor — significant issues</td></tr>
+<tr><td>0-20</td><td>F</td><td>21</td><td>Critical — not recommended</td></tr>
 </table>
 
 <h2>2. Quality Score (Static Analysis — 35% of composite)</h2>

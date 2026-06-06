@@ -18,9 +18,15 @@ async function main() {
   const distribution: Record<string, number> = {};
   const updates: Array<{ toolId: string; overallScore: string; grade: string }> = [];
   let batchCount = 0;
+  let debugCount = 0;
+
+  // Log quality score distribution
+  const qScores: number[] = [];
 
   for (const row of allTools) {
     const q = scoreToolQuality({ id: row.toolId, name: row.toolName, description: row.toolDesc, inputSchema: row.toolSchema as Record<string, unknown> | null, tokenCount: row.toolTokens });
+    qScores.push(q.overallScore);
+    if (debugCount < 5) { console.log(`  [${debugCount+1}] Q=${q.overallScore} schema=${row.toolSchema?"Y":"N"} tokens=${row.toolTokens} desc_len=${row.toolDesc.length}`); debugCount++; }
     const meta = (row.metadata || {}) as Record<string, any>;
     const stars = meta?.stars || 0;
     const pushedAt = meta?.pushed_at;
@@ -49,6 +55,10 @@ async function main() {
     const pct = ((count / allTools.length) * 100).toFixed(1);
     console.log(`  ${g.padEnd(3)} ${count.toLocaleString().padStart(8)} (${pct}%) ${"█".repeat(Math.round(count / allTools.length * 50))}`);
   }
+  qScores.sort((a,b)=>a-b);
+  console.log(`\nQuality Score Distribution:`);
+  console.log(`  Min: ${qScores[0]}  P10: ${qScores[Math.floor(qScores.length*0.1)]}  P25: ${qScores[Math.floor(qScores.length*0.25)]}`);
+  console.log(`  P50: ${qScores[Math.floor(qScores.length*0.5)]}  P75: ${qScores[Math.floor(qScores.length*0.75)]}  P90: ${qScores[Math.floor(qScores.length*0.9)]}  Max: ${qScores[qScores.length-1]}`);
   console.log("\nDone.");
 }
 

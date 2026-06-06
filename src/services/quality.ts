@@ -54,103 +54,71 @@ export function scoreToolQuality(tool: ToolForScoring): Omit<QualityScore, "id" 
 // ── Individual scorers ──
 
 function scoreCorrectness(tool: ToolForScoring, issues: QualityIssue[]): number {
-  if (!tool.inputSchema) {
-    issues.push({
-      type: "correctness", severity: "high",
-      detail: "No input schema — agent cannot understand this tool's parameters",
-    });
-    return 30;
-  }
-
-  let score = 70;
+  if (!tool.inputSchema) return 5; // No schema = near-zero
   const schema = tool.inputSchema as Record<string, unknown>;
-
-  if (!schema.type) {
-    score -= 15;
-    issues.push({ type: "correctness", severity: "medium", detail: "Schema missing 'type' field" });
-  }
-
+  let score = 60;
+  if (!schema.type) { score -= 25; issues.push({ type: "correctness", severity: "high", detail: "Missing type field" }); }
   if (!schema.properties || Object.keys(schema.properties as object).length === 0) {
-    score -= 10;
-    issues.push({ type: "correctness", severity: "low", detail: "Schema has no properties" });
+    score -= 15; issues.push({ type: "correctness", severity: "medium", detail: "No properties" });
   }
-
-  if (schema.properties && Object.keys(schema.properties as object).length >= 2) {
-    score += 15;
-    if (schema.required) score += 10;
-  }
-
+  if (schema.properties && Object.keys(schema.properties as object).length >= 3) { score += 20; }
+  if (schema.properties && Object.keys(schema.properties as object).length >= 5) { score += 10; }
+  if (schema.required) score += 15;
   return Math.max(0, Math.min(100, score));
 }
 
 function scoreEfficiency(tool: ToolForScoring, issues: QualityIssue[]): number {
   const tokens = tool.tokenCount ?? 500;
-  if (tokens <= 80) return 100;
-  if (tokens <= 150) return 85;
-  if (tokens <= 250) return 70;
-  if (tokens <= 400) return 50;
-  if (tokens <= 600) return 30;
-  issues.push({ type: "efficiency", severity: "critical", detail: `${tokens} tokens — excessive context consumption` });
-  return 15;
+  if (tokens <= 50) return 100;
+  if (tokens <= 100) return 90;
+  if (tokens <= 200) return 70;
+  if (tokens <= 350) return 45;
+  if (tokens <= 500) return 20;
+  issues.push({ type: "efficiency", severity: "critical", detail: `${tokens} tokens` });
+  return 5;
 }
 
 function scoreDescription(tool: ToolForScoring, issues: QualityIssue[]): number {
-  let score = 65;
   const desc = tool.description;
   const len = desc.length;
+  let score = 50;
+  if (len < 10) { score = 5; issues.push({ type: "description", severity: "critical", detail: "Extremely short" }); }
+  else if (len < 30) { score -= 30; issues.push({ type: "description", severity: "high", detail: "Too short" }); }
+  else if (len < 50) { score -= 10; }
+  else if (len >= 50 && len <= 200) { score += 25; }
+  else if (len > 500) { score -= 30; issues.push({ type: "description", severity: "high", detail: "Excessive length" }); }
+  else if (len > 300) { score -= 10; }
 
-  if (len < 20) {
-    score -= 40;
-    issues.push({ type: "description", severity: "critical", detail: `Too short (${len} chars)` });
-  } else if (len < 50) {
-    score -= 15;
-    issues.push({ type: "description", severity: "low", detail: `Short (${len} chars)` });
-  } else if (len >= 50 && len <= 200) {
-    score += 15;
-  } else if (len > 400) {
-    score -= 20;
-    issues.push({ type: "description", severity: "medium", detail: `Too long (${len} chars)` });
-  }
+  const verbs = /\b(read|write|query|search|fetch|extract|create|update|delete|list|get|post|execute|run|connect|send|download|upload|manage|control|monitor|track|analyze|generate|build|test|deploy|configure)\b/i;
+  if (verbs.test(desc)) score += 15;
+  else { score -= 15; issues.push({ type: "description", severity: "medium", detail: "No action verbs" }); }
 
-  const actionVerbs = /\b(read|write|query|search|fetch|extract|create|update|delete|list|get|post|execute|run|connect|send|download|upload|manage|control|monitor|track|analyze|generate|build|test|deploy|configure|install|parse|convert|transform|validate|check|verify|scan|audit|optimize|schedule|notify|alert)\b/i;
-  if (actionVerbs.test(desc)) { score += 10; }
-  else { score -= 5; issues.push({ type: "description", severity: "low", detail: "No action verbs" }); }
+  if (/^[a-z][a-z0-9_-]*$/.test(tool.name)) score += 10;
+  else { score -= 15; issues.push({ type: "description", severity: "medium", detail: "Poor naming" }); }
 
-  if (/^[a-z][a-z0-9_]*$/.test(tool.name)) { score += 5; }
-  else { score -= 10; issues.push({ type: "description", severity: "medium", detail: `Name "${tool.name}" should use snake_case` }); }
-
-  if (/example|usage|e\.g\.|such as|like|for instance/i.test(desc)) { score += 5; }
-
+  if (/example|usage|e\.g\.|such as|returns|output/i.test(desc)) score += 10;
   return Math.max(0, Math.min(100, score));
 }
 
 function scoreSecurity(tool: ToolForScoring, issues: QualityIssue[]): number {
-  let score = 75;
+  let score = 60;
   const desc = tool.description.toLowerCase();
-
-  const criticalPatterns = ["ignore previous", "override your", "silently remember", "do not tell", "pretend you are", "always respond with"];
-  for (const pattern of criticalPatterns) {
-    if (desc.includes(pattern)) {
-      score -= 50;
-      issues.push({ type: "security", severity: "critical", detail: `Prompt injection: "${pattern}"` });
-      return Math.max(0, score);
-    }
-  }
-
-  const mediumPatterns = ["without telling", "secretly", "hidden from user", "bypass", "backdoor"];
-  for (const pattern of mediumPatterns) {
-    if (desc.includes(pattern)) { score -= 25; issues.push({ type: "security", severity: "high", detail: `Suspicious: "${pattern}"` }); }
-  }
-
-  if (/security|auth|authenticate|encrypt|sandbox|isolated|permission/i.test(desc)) { score += 10; }
+  const critical = ["ignore previous", "override your", "silently remember", "do not tell", "pretend you are", "always respond with"];
+  for (const p of critical) { if (desc.includes(p)) { score -= 60; issues.push({ type: "security", severity: "critical", detail: "Injection risk" }); return Math.max(0, score); } }
+  const medium = ["without telling", "secretly", "hidden from user", "bypass", "backdoor"];
+  for (const p of medium) { if (desc.includes(p)) { score -= 35; issues.push({ type: "security", severity: "high", detail: "Suspicious pattern" }); } }
+  if (/security|auth|encrypt|sandbox|isolated|permission|rate.limit/i.test(desc)) score += 20;
+  if (/api.key|oauth|token/i.test(desc)) score += 15;
   return Math.max(0, Math.min(100, score));
 }
 
 function scoreInstall(tool: ToolForScoring, issues: QualityIssue[]): number {
-  let score = 50;
-  if (/^npm:|npx /i.test(tool.name)) { score += 20; }
-  else if (/^pypi:|pip /i.test(tool.name)) { score += 20; }
-  if (/npm install|pip install|docker pull|npx |go install/i.test(tool.description)) { score += 15; }
+  let score = 30;
+  if (/^npm:|npx /i.test(tool.name)) score += 40;
+  else if (/^pypi:|pip /i.test(tool.name)) score += 40;
+  else if (/^docker:|ghcr/i.test(tool.name)) score += 35;
+  if (/npm install|pip install|docker pull|npx |go install|cargo install/i.test(tool.description)) score += 25;
+  if (/http|sse|server/i.test(tool.description)) score += 10;
   return Math.max(0, Math.min(100, score));
 }
 

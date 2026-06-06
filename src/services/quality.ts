@@ -166,8 +166,8 @@ export function scoreToGrade(score: number): string {
 }
 
 // ── Option A: Additive Composite Model ──
-// Composite = Quality(0-100) + Community Bonus(0-30) + Trust Bonus(0-20)
-// Range: 0-150 — natural variance from Quality alone
+// Composite = Quality(0-100) + Community Bonus(0-60) + Trust Bonus(0-30)
+// Range: 0-190 — wide variance from Community + Trust bonuses
 
 export function scoreCompositeGrade(qualityScore: number, communityBonus: number, trustBonus: number): {
   composite: number;
@@ -209,53 +209,53 @@ export function scoreCompositeGrade(qualityScore: number, communityBonus: number
 }
 
 /**
- * Community Bonus (0-30)
- * Stars (0-15) + Activity (0-10) + Official (0-5)
+ * Community Bonus (0-60) — widened for variance
+ * Stars (0-30) + Activity (0-20) + Official (0-10)
  */
 export function scoreCommunity(stars: number, lastPushDaysAgo: number | null, isOfficial: boolean, isVerifiedPublisher: boolean): number {
-  // Stars: 0-15
+  // Stars: 0-30 — bigger range for differentiation
   let starScore = 0;
-  if (stars >= 10000) starScore = 15;
-  else if (stars >= 1000) starScore = 13;
-  else if (stars >= 500) starScore = 11;
-  else if (stars >= 100) starScore = 9;
-  else if (stars >= 50) starScore = 7;
-  else if (stars >= 10) starScore = 5;
+  if (stars >= 10000) starScore = 30;
+  else if (stars >= 5000) starScore = 26;
+  else if (stars >= 1000) starScore = 22;
+  else if (stars >= 500) starScore = 18;
+  else if (stars >= 100) starScore = 14;
+  else if (stars >= 50) starScore = 10;
+  else if (stars >= 10) starScore = 6;
   else if (stars >= 1) starScore = 3;
 
-  // Activity: 0-10
+  // Activity: 0-20
   let activityScore = 0;
-  if (lastPushDaysAgo === null) activityScore = 3;
-  else if (lastPushDaysAgo <= 30) activityScore = 10;
-  else if (lastPushDaysAgo <= 180) activityScore = 6;
-  else if (lastPushDaysAgo <= 365) activityScore = 3;
+  if (lastPushDaysAgo === null) activityScore = 5;
+  else if (lastPushDaysAgo <= 30) activityScore = 20;
+  else if (lastPushDaysAgo <= 180) activityScore = 10;
+  else if (lastPushDaysAgo <= 365) activityScore = 5;
 
-  // Official: 0-5
+  // Official: 0-10
   let officialScore = 0;
-  if (isOfficial && isVerifiedPublisher) officialScore = 5;
-  else if (isOfficial) officialScore = 4;
-  else if (isVerifiedPublisher) officialScore = 3;
+  if (isOfficial && isVerifiedPublisher) officialScore = 10;
+  else if (isOfficial) officialScore = 7;
+  else if (isVerifiedPublisher) officialScore = 5;
 
   return starScore + activityScore + officialScore;
 }
 
 /**
- * Trust Bonus (0-20)
- * Success Rate (0-10) + Recency (0-5) + Consistency (0-5)
- * Baseline: 0 (no data = no bonus, not penalty)
+ * Trust Bonus (0-30) — widened for variance
+ * Success Rate (0-15) + Recency (0-8) + Consistency (0-7)
+ * Baseline: 0 (no data = no bonus)
  */
 export function scoreTrust(successRate: number | null, totalCalls: number, lastExecutionDaysAgo: number | null): number {
-  // No real execution data → no bonus (not a penalty)
   if (totalCalls === 0 || successRate === null) return 0;
 
-  const successScore = Math.round((successRate / 100) * 10);
+  const successScore = Math.round((successRate / 100) * 15);
   let recencyScore = 0;
-  if (lastExecutionDaysAgo !== null && lastExecutionDaysAgo <= 7) recencyScore = 5;
-  else if (lastExecutionDaysAgo !== null && lastExecutionDaysAgo <= 30) recencyScore = 3;
+  if (lastExecutionDaysAgo !== null && lastExecutionDaysAgo <= 7) recencyScore = 8;
+  else if (lastExecutionDaysAgo !== null && lastExecutionDaysAgo <= 30) recencyScore = 4;
 
   let consistencyScore = 0;
-  if (totalCalls >= 1000) consistencyScore = 5;
-  else if (totalCalls >= 100) consistencyScore = 3;
+  if (totalCalls >= 1000) consistencyScore = 7;
+  else if (totalCalls >= 100) consistencyScore = 4;
 
-  return Math.min(20, successScore + recencyScore + consistencyScore);
+  return Math.min(30, successScore + recencyScore + consistencyScore);
 }

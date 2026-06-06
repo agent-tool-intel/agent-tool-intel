@@ -188,24 +188,24 @@ ${gradeDist.map(g => {
 <tr><td>Install Reliability</td><td>15%</td><td>Detected install method (npm/pip/go/docker). Clear install instructions = higher score.</td></tr>
 </table>
 
-<h2>3. Community Bonus（Adds 0-30 points）</h2>
-<p>How agents gauge reliability through community signals. Stars, activity, and official status <strong>add points</strong> on top of quality — never drag you down.</p>
+<h2>3. Community Bonus（Adds 0-60 points）</h2>
+<p>Stars, activity, and official status <strong>add points</strong> on top of quality. Wide range creates natural differentiation.</p>
 <table>
 <tr><th>Signal</th><th>Max</th><th>How scored</th></tr>
-<tr><td>GitHub Stars</td><td>15</td><td>10K+=15, 1K=13, 500=11, 100=9, 50=7, 10=5, 1=3, 0=0</td></tr>
-<tr><td>Activity</td><td>10</td><td>Push ≤30d=10, ≤180d=6, ≤365d=3, unknown=3, abandoned=0</td></tr>
-<tr><td>Official</td><td>5</td><td>Official+Verified=5, Official=4, Verified=3, none=0</td></tr>
-<tr><td colspan="3"><strong>Max bonus: 30</strong> points added to your Quality Score</td></tr>
+<tr><td>GitHub Stars</td><td>30</td><td>10K+=30, 5K=26, 1K=22, 500=18, 100=14, 50=10, 10=6, 1=3</td></tr>
+<tr><td>Activity</td><td>20</td><td>Push ≤30d=20, ≤180d=10, ≤365d=5, unknown=5</td></tr>
+<tr><td>Official</td><td>10</td><td>Official+Verified=10, Official=7, Verified=5</td></tr>
+<tr><td colspan="3"><strong>Max bonus: 60</strong></td></tr>
 </table>
 
-<h2>4. Trust Bonus（Adds 0-20 points）</h2>
-<p>Real-world agent execution data from Phase 3. <strong>No data = no bonus, not a penalty.</strong> Tools with proven execution success earn additional points.</p>
+<h2>4. Trust Bonus（Adds 0-30 points）</h2>
+<p>Real execution data from Phase 3. <strong>No data = 0.</strong> Proven tools earn significant bonus.</p>
 <table>
 <tr><th>Signal</th><th>Max</th><th>How scored</th></tr>
-<tr><td>Success Rate</td><td>10</td><td>% success × 0.1. No data = 0.</td></tr>
-<tr><td>Recency</td><td>5</td><td>Executed ≤7d=5, ≤30d=3, unknown=0</td></tr>
-<tr><td>Consistency</td><td>5</td><td>1K+ calls=5, 100+=3, none=0</td></tr>
-<tr><td colspan="3"><strong>Baseline (no data): 0</strong> — bonus only for proven tools</td></tr>
+<tr><td>Success Rate</td><td>15</td><td>% × 0.15. No data = 0.</td></tr>
+<tr><td>Recency</td><td>8</td><td>Executed ≤7d=8, ≤30d=4</td></tr>
+<tr><td>Consistency</td><td>7</td><td>1K+ calls=7, 100+=4</td></tr>
+<tr><td colspan="3"><strong>Baseline: 0</strong></td></tr>
 </table>
 
 <h2>5. Why This Works</h2>

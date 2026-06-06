@@ -3,7 +3,7 @@ import app from "./app.js";
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
-console.log(`🧠 Agent Tool Intelligence Layer v0.1.0`);
+console.log(`🧠 Agent Tool Intelligence v0.2.0`);
 console.log(`🚀 Starting server on port ${PORT}...`);
 
 serve({

@@ -176,15 +176,15 @@ export function scoreCompositeGrade(qualityScore: number, communityBonus: number
 } {
   const composite = Math.round((qualityScore + communityBonus + trustBonus) * 100) / 100;
 
-  // 8-grade mapping on 0-150 scale
+  // 8-grade mapping — calibrated to Additive Model score distribution
   let grade: string;
-  if (composite >= 120) grade = "A+";
-  else if (composite >= 100) grade = "A";
-  else if (composite >= 85) grade = "B+";
+  if (composite >= 95) grade = "A+";
+  else if (composite >= 85) grade = "A";
+  else if (composite >= 78) grade = "B+";
   else if (composite >= 70) grade = "B";
-  else if (composite >= 58) grade = "C+";
-  else if (composite >= 45) grade = "C";
-  else if (composite >= 35) grade = "D";
+  else if (composite >= 62) grade = "C+";
+  else if (composite >= 54) grade = "C";
+  else if (composite >= 45) grade = "D";
   else grade = "F";
 
   // Quality Floor: caps max grade

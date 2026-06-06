@@ -167,14 +167,14 @@ ${gradeDist.map(g => {
 <h3>Grade Mapping（0-150 Scale）</h3>
 <table>
 <tr><th>Composite Score</th><th>Grade</th><th>What it means</th></tr>
-<tr><td>120-150</td><td>A+</td><td>Elite — quality + popularity + real usage</td></tr>
-<tr><td>100-119</td><td>A</td><td>Excellent — strong across all dimensions</td></tr>
-<tr><td>85-99</td><td>B+</td><td>Very good — close to A, clear path to improve</td></tr>
-<tr><td>70-84</td><td>B</td><td>Good — solid quality, room to grow community</td></tr>
-<tr><td>58-69</td><td>C+</td><td>OK — decent quality, needs promotion or usage</td></tr>
-<tr><td>45-57</td><td>C</td><td>Needs work — quality issues or no community signal</td></tr>
-<tr><td>35-44</td><td>D</td><td>Poor — significant quality or maintenance issues</td></tr>
-<tr><td>0-34</td><td>F</td><td>Critical — not recommended for agents</td></tr>
+<tr><td>95+</td><td>A+</td><td>Elite — quality + popularity + real usage</td></tr>
+<tr><td>85-94</td><td>A</td><td>Excellent — strong across all dimensions</td></tr>
+<tr><td>78-84</td><td>B+</td><td>Very good — close to A, clear path to improve</td></tr>
+<tr><td>70-77</td><td>B</td><td>Good — solid quality, room to grow community</td></tr>
+<tr><td>62-69</td><td>C+</td><td>OK — decent quality, needs promotion or usage</td></tr>
+<tr><td>54-61</td><td>C</td><td>Needs work — quality issues or no community signal</td></tr>
+<tr><td>45-53</td><td>D</td><td>Poor — significant quality or maintenance issues</td></tr>
+<tr><td>0-44</td><td>F</td><td>Critical — not recommended for agents</td></tr>
 </table>
 
 <h2>2. Quality Score (Static Analysis — 35% of composite)</h2>

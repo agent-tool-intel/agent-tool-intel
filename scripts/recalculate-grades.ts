@@ -98,7 +98,7 @@ async function batchUpdate(batch: Array<{ toolId: string; overallScore: string; 
     UPDATE quality_scores AS qs SET
       overall_score = v.overall_score,
       grade = v.grade,
-      updated_at = NOW()
+      scored_at = NOW()
     FROM (VALUES ${values}) AS v(tool_id, overall_score, grade)
     WHERE qs.tool_id = v.tool_id::uuid
   `));

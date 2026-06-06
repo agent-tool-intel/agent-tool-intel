@@ -1,3 +1,6 @@
+// Agent Tool Intelligence — Scoring Engine v2 (Option A: Additive Model)
+// Composite = Quality(0-100) + Community Bonus(0-30) + Trust Bonus(0-20)
+
 import type { QualityScore, QualityIssue } from "../types/index.js";
 
 interface ToolForScoring {

@@ -287,11 +287,12 @@ export function scoreCommunity(stars: number, lastPushDaysAgo: number | null, is
 
 /**
  * Calculate Trust Score
- * Success Rate (0-40, baseline 20) + Recency (0-30) + Consistency (0-30)
+ * Success Rate (0-40) + Recency (0-30) + Consistency (0-30)
+ * IMPORTANT: Baseline is 40 — all tools start here, rise with real data
  */
 export function scoreTrust(successRate: number | null, totalCalls: number, lastExecutionDaysAgo: number | null): number {
-  // If no real execution data → baseline 20
-  if (totalCalls === 0 || successRate === null) return 20;
+  // If no real execution data → baseline 40 (tool gets benefit of doubt)
+  if (totalCalls === 0 || successRate === null) return 40;
 
   // Success rate: scale from baseline
   const successScore = Math.round((successRate / 100) * 40);
@@ -303,11 +304,48 @@ export function scoreTrust(successRate: number | null, totalCalls: number, lastE
   else if (lastExecutionDaysAgo <= 30) recencyScore = 20;
   else if (lastExecutionDaysAgo <= 90) recencyScore = 10;
 
-  // Consistency: variance proxy
-  let consistencyScore = 20; // baseline
+  // Consistency: variance proxy — starts higher
+  let consistencyScore = 25; // baseline
   if (totalCalls >= 1000) consistencyScore = 30;
-  else if (totalCalls >= 100) consistencyScore = 25;
-  else if (totalCalls >= 10) consistencyScore = 20;
+  else if (totalCalls >= 100) consistencyScore = 28;
+  else if (totalCalls >= 10) consistencyScore = 25;
 
-  return Math.round(successScore + recencyScore + consistencyScore);
+  return Math.min(100, Math.round(successScore + recencyScore + consistencyScore));
+}
+
+/**
+ * Calculate Community Score from agent signals
+ * Stars (log scale, 0-50) + Activity (0-30) + Official (tiered, 0-20)
+ * Floor: 10 for any active tool (agents need to see some community signal)
+ */
+export function scoreCommunity(stars: number, lastPushDaysAgo: number | null, isOfficial: boolean, isVerifiedPublisher: boolean): number {
+  // Stars: log scale — slightly more generous at low end
+  let starScore = 0;
+  if (stars >= 10000) starScore = 50;
+  else if (stars >= 1000) starScore = 45;
+  else if (stars >= 500) starScore = 40;
+  else if (stars >= 100) starScore = 32;
+  else if (stars >= 50) starScore = 25;
+  else if (stars >= 10) starScore = 18;
+  else if (stars >= 5) starScore = 12;
+  else if (stars >= 1) starScore = 8;
+
+  // Activity: time since last push
+  let activityScore = 0;
+  if (lastPushDaysAgo === null) activityScore = 10; // unknown → give some credit
+  else if (lastPushDaysAgo <= 30) activityScore = 30;
+  else if (lastPushDaysAgo <= 180) activityScore = 20;
+  else if (lastPushDaysAgo <= 365) activityScore = 10;
+  // > 365 = abandoned = 0
+
+  // Official: tiered
+  let officialScore = 0;
+  if (isOfficial && isVerifiedPublisher) officialScore = 20;
+  else if (isOfficial) officialScore = 15;
+  else if (isVerifiedPublisher) officialScore = 10;
+
+  // Floor: 10 for any active tool, 5 for any tool
+  const raw = starScore + activityScore + officialScore;
+  if (raw < 5) return 5;
+  return Math.min(100, raw);
 }

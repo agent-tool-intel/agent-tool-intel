@@ -56,10 +56,10 @@ export function scoreToolQuality(tool: ToolForScoring): Omit<QualityScore, "id" 
 function scoreCorrectness(tool: ToolForScoring, issues: QualityIssue[]): number {
   if (!tool.inputSchema) {
     issues.push({
-      type: "correctness", severity: "medium",
-      detail: "No input schema detected — agent must rely on description alone",
+      type: "correctness", severity: "high",
+      detail: "No input schema — agent cannot understand this tool's parameters",
     });
-    return 50;
+    return 30;
   }
 
   let score = 70;
@@ -88,10 +88,10 @@ function scoreEfficiency(tool: ToolForScoring, issues: QualityIssue[]): number {
   if (tokens <= 80) return 100;
   if (tokens <= 150) return 85;
   if (tokens <= 250) return 70;
-  if (tokens <= 400) return 55;
-  if (tokens <= 600) return 40;
-  issues.push({ type: "efficiency", severity: "high", detail: `${tokens} tokens — consumes significant context` });
-  return 25;
+  if (tokens <= 400) return 50;
+  if (tokens <= 600) return 30;
+  issues.push({ type: "efficiency", severity: "critical", detail: `${tokens} tokens — excessive context consumption` });
+  return 15;
 }
 
 function scoreDescription(tool: ToolForScoring, issues: QualityIssue[]): number {
@@ -176,15 +176,15 @@ export function scoreCompositeGrade(qualityScore: number, communityBonus: number
 } {
   const composite = Math.round((qualityScore + communityBonus + trustBonus) * 100) / 100;
 
-  // 8-grade mapping — calibrated to Additive Model score distribution
+  // 8-grade mapping — pulls bottom down for spread
   let grade: string;
   if (composite >= 95) grade = "A+";
   else if (composite >= 85) grade = "A";
   else if (composite >= 78) grade = "B+";
   else if (composite >= 70) grade = "B";
-  else if (composite >= 62) grade = "C+";
-  else if (composite >= 54) grade = "C";
-  else if (composite >= 45) grade = "D";
+  else if (composite >= 65) grade = "C+";
+  else if (composite >= 58) grade = "C";
+  else if (composite >= 50) grade = "D";
   else grade = "F";
 
   // Quality Floor: caps max grade

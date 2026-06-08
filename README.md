@@ -2,8 +2,8 @@
 
 > **The quality standard for AI agent tools.**
 >
-> 39,752+ MCP servers scored. Semantic search. Trust engine. Execution analytics.
-> Built for AI agents. Transparent for builders. Open source.
+> 39,752+ MCP servers scored. Quality Score + Community Bonus + Trust Bonus.
+> Three-dimensional additive model. Built for AI agents. Transparent for builders. Open source.
 
 <p align="center">
   <a href="https://agent-tool-intel-production.up.railway.app">
@@ -44,7 +44,7 @@
 | Treasure | What you get |
 |----------|-------------|
 | 🔍 **Semantic Search API** | "Extract tables from PDF" → ranked results. Not keyword match. |
-| 🧠 **Agent Readiness Score** | 6 signals agents actually care about. |
+| 🧠 **Additive Scoring** | Quality Score + Community Bonus + Trust Bonus. Clear path to improve. |
 | 🛡️ **Trust Engine** | Real-world success rates. Not simulated. |
 | 🚀 **Execution Gateway** *(coming)* | Execute tools via one API call. |
 

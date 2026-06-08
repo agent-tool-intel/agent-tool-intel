@@ -676,7 +676,7 @@ footer { text-align:center; padding:40px 20px; color:#484f58; font-size:0.85em; 
 
 <div class="hero">
   <h1>Agent Tool Intelligence</h1>
-  <p>The quality standard for MCP tools. <strong>${totalServers.toLocaleString()}</strong> servers indexed. Semantic search, quality scoring, trust engine, agent-native signals — built for agents, transparent for builders.</p>
+  <p>You built an MCP server. Is it any good? <strong>54% of MCP tools are invisible to AI agents</strong> — solid code, zero adoption. Find out if yours is one of them. <strong>${totalServers.toLocaleString()}</strong> servers scored. Free. No signup.</p>
   <span class="api-url">agent-tool-intel-production.up.railway.app</span>
 </div>
 

@@ -1,9 +1,10 @@
 # Agent Tool Intelligence
 
-> **The quality standard for AI agent tools.**
+> **You built an MCP server. Is it any good?**
 >
-> 39,752+ MCP servers scored. Quality Score + Community Bonus + Trust Bonus.
-> Three-dimensional additive model. Built for AI agents. Transparent for builders. Open source.
+> 54% of MCP servers have solid code but zero community adoption — invisible to the agents that need them. Don't let yours be one.
+>
+> 39,752+ servers scored. Quality Score + Community Bonus + Trust Bonus. Free. No signup. Open source.
 
 <p align="center">
   <a href="https://agent-tool-intel-production.up.railway.app">

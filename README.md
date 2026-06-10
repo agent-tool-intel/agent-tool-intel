@@ -12,6 +12,8 @@
   </a>
   <br/>
   <sub>Every MCP server deserves a grade. <a href="https://agent-tool-intel-production.up.railway.app">Check yours →</a></sub>
+  <br/>
+  📝 <a href="https://dev.to/agenttoolintel">Read our blog on dev.to →</a>
 </p>
 
 ---

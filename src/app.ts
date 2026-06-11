@@ -22,6 +22,23 @@ app.use("*", async (c, next) => {
   c.res.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
 });
 
+// Page view counter（simple analytics）
+const pageViews: Record<string, number> = {};
+app.use("*", async (c, next) => {
+  const path = c.req.path;
+  if (!path.startsWith("/api/") && path !== "/health") {
+    pageViews[path] = (pageViews[path] || 0) + 1;
+  }
+  await next();
+});
+
+// Analytics endpoint
+app.get("/api/v1/analytics", (c) => {
+  const total = Object.values(pageViews).reduce((a, b) => a + b, 0);
+  const top = Object.entries(pageViews).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  return c.json({ total, top: Object.fromEntries(top), detail: pageViews });
+});
+
 // Health check
 app.get("/health", (c) => c.json({ status: "ok", version: "0.2.0" }));
 

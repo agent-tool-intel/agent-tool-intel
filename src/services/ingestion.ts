@@ -186,32 +186,39 @@ const GITHUB_QUERIES = [
   "topic:mcp created:>2025-06-01",
 ];
 
-// Filter: skip repos that are NOT MCP servers
+// Filter: skip repos that are NOT real MCP servers
 function isMcpServer(repo: { description?: string | null; topics?: string[]; name?: string }): boolean {
   const desc = (repo.description || "").toLowerCase();
   const topics = (repo.topics || []).map(t => t.toLowerCase());
   const name = (repo.name || "").toLowerCase();
   const fullText = desc + " " + topics.join(" ") + " " + name;
 
-  // Skip: awesome lists, curated collections, templates
+  // Skip: awesome lists, curated collections, templates, tools, platforms
   const nonMcpPatterns = [
     "awesome", "awesome-list", "curated list", "collection of",
     "awesome-mcp", "mcp-list", "mcp directory", "mcp registry",
     "template", "starter", "boilerplate",
     "not an mcp", "not a mcp",
+    "mcp marketplace", "mcp aggregator", "mcp hub", "mcp catalog",
+    "mcp index", "mcp explorer", "mcp search",
+    "list of mcp", "mcp scanner", "mcp scoring", "mcp quality",
   ];
   for (const p of nonMcpPatterns) {
     if (fullText.includes(p)) return false;
   }
 
-  // Must have at least one MCP indicator
+  // Skip: repos with zero MCP topics AND no MCP mention in description
+  const hasMcpTopic = topics.some(t => t.includes("mcp") || t.includes("model-context-protocol"));
+  const hasMcpInDesc = desc.includes("mcp") || desc.includes("model context protocol");
+  if (!hasMcpTopic && !hasMcpInDesc) return false;
+
+  // Must have at least one clear MCP indicator
   const mcpIndicators = [
     "mcp server", "mcp tool", "mcp client", "mcp integration",
     "model context protocol", "modelcontextprotocol",
-    "mcp for", "mcp to", "mcp wrapper",
   ];
-  const hasMcpIndicator = mcpIndicators.some(i => fullText.includes(i));
-  if (!hasMcpIndicator) return false;
+  const hasStrongMcpSignal = mcpIndicators.some(i => fullText.includes(i));
+  if (!hasStrongMcpSignal) return false;
 
   return true;
 }

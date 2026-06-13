@@ -39,6 +39,14 @@ app.get("/api/v1/analytics", (c) => {
   return c.json({ total, top: Object.fromEntries(top), detail: pageViews });
 });
 
+// Trigger ingestion (admin)
+app.post("/api/v1/admin/ingest", async (c) => {
+  const { runIngestion } = await import("./services/ingestion.js");
+  // Run in background
+  runIngestion().then(r => console.log(`Ingestion done: ${r.serversAdded} servers, ${r.toolsAdded} tools`)).catch(e => console.error("Ingestion error:", e));
+  return c.json({ status: "started", message: "Ingestion running in background. Check Railway logs for results." });
+});
+
 // Health check
 app.get("/health", (c) => c.json({ status: "ok", version: "0.2.0" }));
 

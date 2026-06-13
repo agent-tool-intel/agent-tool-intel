@@ -43,7 +43,7 @@ app.get("/api/v1/analytics", (c) => {
 app.post("/api/v1/admin/ingest", async (c) => {
   const { runIngestion } = await import("./services/ingestion.js");
   // Run in background
-  runIngestion().then(r => console.log(`Ingestion done: ${r.serversAdded} servers, ${r.toolsAdded} tools`)).catch(e => console.error("Ingestion error:", e));
+  runIngestion().then(r => console.log(`Ingestion done: ${r.newServers} new servers, ${r.newTools} new tools, ${r.totalServers} total`)).catch(e => console.error("Ingestion error:", e));
   return c.json({ status: "started", message: "Ingestion running in background. Check Railway logs for results." });
 });
 

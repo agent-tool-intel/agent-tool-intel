@@ -141,31 +141,41 @@ export async function scrapeMcpSo(): Promise<ScrapedServer[]> {
 
 const GITHUB_QUERIES = [
   // Topic-based (highest signal)
-  "topic:mcp-server stars:>5",
-  "topic:model-context-protocol stars:>5",
-  "topic:mcp stars:>5",
-  "topic:mcp-tool stars:>5",
-  "topic:mcp-client stars:>5",
-  "topic:mcp-integration stars:>5",
-  // Keyword-based (long tail)
-  "mcp server in:description stars:>10",
-  "\"model context protocol\" in:description stars:>10",
-  "mcp in:name stars:>10 NOT topic:mcp-server NOT topic:model-context-protocol",
+  // All MCP servers (no star filter — catch everything)
+  "topic:mcp-server",
+  "topic:model-context-protocol",
+  "topic:mcp",
+  "topic:mcp-tool",
+  "topic:mcp-client",
+  "topic:mcp-integration",
+  // Keyword-based (long tail, no minimum stars)
+  "mcp server in:description",
+  "\"model context protocol\" in:description",
+  "mcp in:name NOT topic:mcp-server NOT topic:model-context-protocol",
   // Language-specific
-  "topic:mcp-server language:typescript stars:>3",
-  "topic:mcp-server language:python stars:>3",
-  "topic:mcp-server language:go stars:>3",
+  "topic:mcp-server language:typescript",
+  "topic:mcp-server language:python",
+  "topic:mcp-server language:go",
+  "topic:mcp-server language:rust",
+  "topic:mcp-server language:java",
+  "topic:mcp-server language:javascript",
   // Deep search: README mentions, config files, orgs
-  "\"mcp server\" in:readme stars:>3",
-  "\"model context protocol\" in:readme stars:>3",
+  "\"mcp server\" in:readme",
+  "\"model context protocol\" in:readme",
   "mcp.json in:name",
   "filename:mcp.json",
   "org:modelcontextprotocol",
   "\"@modelcontextprotocol/sdk\" in:description",
-  "\"mcp-server\" in:name stars:>1",
-  // No-star threshold (catch everything)
-  "topic:mcp-server pushed:>2025-01-01",
-  "topic:model-context-protocol pushed:>2025-01-01",
+  "\"mcp-server\" in:name",
+  // No-star threshold (catch everything, extended date range)
+  "topic:mcp-server pushed:>2024-01-01",
+  "topic:model-context-protocol pushed:>2024-01-01",
+  // npm-based discovery
+  "npm install mcp-server in:readme",
+  "npx mcp-server in:description",
+  // New sources
+  "mcp_server in:name",
+  "\"MCP tool\" in:description",
   // Long tail: search README for MCP patterns
   "\"npm install\" mcp in:readme language:typescript stars:>0",
   "\"pip install\" mcp in:readme language:python stars:>0",
